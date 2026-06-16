@@ -1,0 +1,46 @@
+---
+title: Video Pass-through
+hide_title: true
+hide_table_of_contents: true
+---
+
+import FeatureHeader from '@site/src/components/FeatureHeader'
+import YouTubeEmbed from '@site/src/components/YouTubeEmbed'
+import UISettings from '@site/src/components/UISettings'
+
+<FeatureHeader
+  title="Video Pass-through"
+  products={['AJA Bridge Live', 'Comprimato Live Transcoder']}
+  useCases={['Remote production', 'On-prem production', 'Live events']}
+  keywords={['pass-through', 'bypass', 'low-latency', 'monitoring', 'quality preservation', 'clean feed']}
+  since="v1.0"
+/>
+
+<div className="feature-detail__section">
+
+Video Pass-through routes an input video signal directly to a configured output destination without re-encoding. The compressed bitstream is forwarded as-is, preserving the original quality and eliminating the latency and quality loss associated with a decode-re-encode cycle.
+
+## Key capabilities
+
+Forward incoming compressed video to one or more outputs without decoding or re-encoding. Preserves original codec, bitrate, and quality. Significantly lower latency compared to transcode paths. Can be combined with active transcode destinations on the same pipeline.
+
+## Broadcast engineering context
+
+When an already-encoded contribution feed arrives at the encoder (e.g., from a remote encoder via SRT), re-encoding it would introduce a generation loss and additional latency. Pass-through avoids this by forwarding the compressed stream directly. This is particularly valuable in relay and distribution topologies where the encoder acts as a routing node rather than an encoding node.
+
+## Use cases
+
+- **Signal relay** — forward an SRT contribution feed to multiple destinations without re-encoding
+- **Clean feed distribution** — pass an unmodified feed to a monitoring or archive destination
+- **Low-latency monitoring** — provide a reference output with minimal added delay
+- **Hybrid pipelines** — mix pass-through and transcode outputs from a single input
+
+<UISettings>
+
+Navigate to **Settings → Destinations**, select a destination, and set **Mode** to **Pass-through**. Other destinations on the same pipeline can use a different mode (e.g. Transcode) at the same time — pass-through is configured per destination, not per encoder.
+
+</UISettings>
+
+</div>
+
+<YouTubeEmbed url="https://www.youtube.com/watch?v=nvNTV0Rva0o" title="Video Pass-through" />

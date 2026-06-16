@@ -1,0 +1,69 @@
+---
+title: Performance Testing
+sidebar_position: 6
+---
+
+This page documents Live Transcoder performance benchmarks across common pipeline types. All tests were run against **AWS EC2 instance types**.
+
+## MPEG-TS to NDI Conversion
+
+| Concurrent Pipelines | Resolution | Frame Rate | Codec | Instance Type |
+|---|---|---|---|---|
+| 4 | 1080i/p | 50–60 fps | H.264 | g4dn.4xlarge |
+| 8 | 1080i/p | 50–60 fps | H.265 | g4dn.4xlarge |
+
+## MPEG-TS Gateway (No Conversion)
+
+Passthrough mode with RTP output — no transcoding performed.
+
+| Concurrent Pipelines | Resolution | Codec | Instance Type |
+|---|---|---|---|
+| Up to 14 | 1080p | H.264/H.265 | c5.xlarge |
+
+## Scan Type Conversion
+
+Interlaced-to-progressive conversion.
+
+| Concurrent Pipelines | Resolution | Frame Rate | Codec | Instance Type |
+|---|---|---|---|---|
+| 4 | 1080i→1080p | Standard broadcast | H.264 | g4dn.4xlarge |
+
+## Framerate Conversion
+
+### Motion-Compensated (High CPU)
+
+| Concurrent Pipelines | Resolution | Conversion | Instance Type |
+|---|---|---|---|
+| 1 | 4K | 50→60 fps | c5a.24xlarge |
+
+### Linear Framerate Conversion (No Motion Compensation)
+
+| Concurrent Pipelines | Resolution | Conversion | Instance Type |
+|---|---|---|---|
+| 8 | 1920×1080 | Various | c6a.32xlarge |
+
+:::note
+A single fully motion-compensated stream at 1920×1080 (50→60 fps) requires at least **48 vCPUs**. 4K motion-compensated conversion requires the largest available CPU instances.
+:::
+
+## Codec Cross-Conversion
+
+H.264 to H.265 transcoding.
+
+| Concurrent Pipelines | Resolution | Frame Rate | Instance Type |
+|---|---|---|---|
+| 8 | 1080p | 60 fps | g4dn.4xlarge |
+
+## Instance Type Summary
+
+| Instance Family | Best For |
+|---|---|
+| **g4dn, g5** (Nvidia T4/A10G GPU) | Codec operations, NDI conversion, scan conversion |
+| **c5, c6a** (CPU-focused) | Gateway (passthrough), linear framerate conversion |
+| **c5a.24xlarge+** | Motion-compensated framerate conversion at high resolutions |
+
+## Related Resources
+
+- [CPU-GPU Processing Table](./cpu-gpu-processing-table)
+- [Running Without GPU](../run/running-without-gpu)
+- [Error: Some Video Frames Are Being Dropped](../troubleshooting/frame-dropping)

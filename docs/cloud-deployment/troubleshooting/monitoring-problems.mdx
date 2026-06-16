@@ -1,0 +1,22 @@
+---
+title: Monitoring problems
+hide_title: false
+---
+
+It's recommended to read [Monitoring](../usage/monitoring) first.
+
+# No Monitoring Group ID has been selected for monitoring
+
+You will encounter this message on the [Monitoring Dashboard](../usage/monitoring#monitoring-dashboard) when a URL parameter `monitoring_group_id` is not present. The Monitoring Dashboard needs to know which instances of Live Transcoder it should show monitoring information about.
+
+* If you have a Docker deployment, follow [these instructions](../usage/monitoring#access-the-monitoring-dashboard-for-docker-deployments).
+* If you have bare-metal Live Transcoder or Bridge Live, follow [these instructions](../usage/monitoring#access-the-monitoring-dashboard-for-bare-metal-live-transcoder--bridge-live-installations).
+
+# No pipelines are visible for the selected Monitoring Group ID
+
+This message appears on the [Monitoring Dashboard](../usage/monitoring#monitoring-dashboard) when there are no pipelines in Live Transcoder or when monitoring is disabled.
+
+* Check that you have pipelines in Live Transcoder.
+* Ensure that [monitoring is enabled](../usage/monitoring#how-to-enable-monitoring).
+* Ensure that the Live Transcoder is connected to the Internet and has a DNS server set
+* The minimum supported Live Transcoder version is v1.15.3

@@ -1,0 +1,28 @@
+---
+title: Prepare host OS - Others
+hide_title: false
+---
+
+# General OS requirements
+
+1. The host instance needs access to the internet and a working DNS
+2. The host OS needs to expose the cgroups v1. New OSs often expose only cgroups v2.
+   * You can check currently exposed cgroup versions by: `mount | grep '^cgroup' | awk '{print $1}' | uniq`
+   * `cgroup` means v1 is exposed, `cgroup2` means v2 is exposed (can be both)
+   * Kernel can be forced to expose also v1 cgroups by adding kernel parameter `systemd.unified_cgroup_hierarchy=0`
+3. Docker-CE version 20.0 or later
+4. nvidia-container-toolkit version 1.17.7, there is currently a known issue with 1.17.8-1.18.0. Recommend these versions are avoided or see the following:
+5. Nvidia driver version 535 or later
+6. docker-compose command version 2.5 or later
+7. The host must have these firewall ports/protocols allowed
+
+* SSH (TCP port 22) - for SSH
+* HTTP (TCP port 80) - needed for access to web UI and HLS output
+* HTTPS (TCP port 443) - needed for secure access to web UI and HLS output
+* MPEG-TS over RTP/UDP/SRT (UDP ports) - add custom ports for your MPEG-TS streams
+* NDI (TCP&UDP) - needed for NDI to work, the easiest way is to open port range 5353-7999 for both TCP & UDP [[NDI docs](https://ndi.tv/tools/education/networking/best-practices/networking-best-practice/)]
+* RTMP input (TCP port 1935) - needed for RTMP server to listen on this port
+* IGMP - for multicast
+
+8. mDNS disabled - for NDI discovery working in the Docker, typically done by disabling/removing the avahi-daemon
+9. UDP kernel buffers max size for write and read set to 256MB

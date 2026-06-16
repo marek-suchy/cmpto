@@ -1,0 +1,46 @@
+---
+title: Start/Stop Destinations
+hide_title: true
+hide_table_of_contents: true
+---
+
+import FeatureHeader from '@site/src/components/FeatureHeader'
+import YouTubeEmbed from '@site/src/components/YouTubeEmbed'
+import UISettings from '@site/src/components/UISettings'
+
+<FeatureHeader
+  title="Start/Stop Destinations"
+  products={['AJA Bridge Live', 'Comprimato Live Transcoder']}
+  useCases={['Remote production', 'Cloud production', 'Live events', 'Broadcast contribution']}
+  keywords={['runtime control', 'multi-output', 'workflow', 'live production', 'SRT', 'MPEG-TS']}
+  since="v1.18"
+/>
+
+<div className="feature-detail__section">
+
+Start/Stop Destinations allows operators to independently start and stop individual output destinations on a running pipeline without interrupting the encoder or other active outputs. This enables flexible multi-destination management during live productions without requiring a full pipeline restart.
+
+## Key capabilities
+
+Start or stop any configured output destination independently at runtime. No encoder restart required. All other active destinations remain unaffected. Supported on SRT, RTMP, and MPEG-TS outputs. Status visible in the Web UI and via API.
+
+## Broadcast engineering context
+
+In multi-destination live productions, the requirement to add or remove a destination mid-stream is common — a platform may go offline, a backup stream may become unnecessary, or a new distribution point may need to be added after the broadcast has started. Previously this required stopping the entire pipeline, which caused disruption to all destinations. Start/Stop Destinations eliminates this constraint.
+
+## Use cases
+
+- **Multi-platform streaming** — activate/deactivate social media outputs independently
+- **Cloud production** — connect or disconnect cloud processing nodes during a live show
+- **Backup management** — start a backup destination only when the primary shows instability
+- **Contribution routing** — redirect outputs to different MCR endpoints without downtime
+
+<UISettings>
+
+Each configured destination is listed in the **Destinations** panel. Use the **Start** and **Stop** controls next to the destination name to activate or deactivate it while the encoder is running. The encoder status and all other destinations remain unaffected.
+
+</UISettings>
+
+</div>
+
+<YouTubeEmbed url="https://www.youtube.com/watch?v=nvNTV0Rva0o" title="Start/Stop Destinations" />

@@ -1,0 +1,64 @@
+---
+title: GPU Codec Troubleshooting
+sidebar_position: 3
+---
+
+## Problem
+
+When running Live Transcoder in Docker, you may encounter GPU initialization errors such as:
+
+- `H26xDec_0_0: Could not open codec`
+- `Nvidia driver Failed to initialize NVML`
+
+## Root Cause
+
+A documented bug exists in **Nvidia Container Toolkit versions 1.17.8 through 1.18.0** that prevents proper GPU passthrough to Docker containers. Nvidia has acknowledged this issue in their official documentation.
+
+## Solution 1: Downgrade the NVIDIA Container Toolkit (Recommended)
+
+Downgrade to version **1.17.7-1**, which does not have this issue:
+
+```bash
+sudo apt-get purge -y nvidia-container-toolkit
+sudo apt-get install -y nvidia-container-toolkit=1.17.7-1
+sudo systemctl restart docker
+```
+
+Then recreate the container:
+
+```bash
+docker-compose up -d --force-recreate
+```
+
+## Solution 2: Manual Device Mapping Workaround
+
+If downgrading is not feasible, manually add GPU device mappings to your `docker-compose.yml`:
+
+```bash
+nano docker-compose.yml
+```
+
+Add the following under the service's `devices` section:
+
+```yaml
+    devices:
+      - /dev/nvidia0:/dev/nvidia0
+      - /dev/nvidiactl:/dev/nvidiactl
+      - /dev/nvidia-uvm:/dev/nvidia-uvm
+```
+
+Then recreate the container:
+
+```bash
+docker-compose up -d --force-recreate
+```
+
+## Verification
+
+After applying either fix, verify GPU access inside the container:
+
+```bash
+docker exec -it transcoder0 nvidia-smi
+```
+
+A successful output showing your GPU details confirms the fix is working.

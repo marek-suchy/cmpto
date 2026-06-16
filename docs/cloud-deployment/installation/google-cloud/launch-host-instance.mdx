@@ -1,0 +1,170 @@
+---
+title: Launch host instance
+hide_title: false
+---
+
+# Configuring the instance
+
+Navigate from the Google Cloud dashboard to _Compute Engine_ and find _VM Instances_.
+
+![](/img/cloud-deployment/Screenshot_2023-05-19_at_1.52.41_PM.png)
+
+Click on _Create instance_ button located at the top of the page.
+
+## Name and region
+
+Specify the name of your instance and the designated region in which the instance should be hosted.
+
+## Machine configuration
+
+### GPU selection
+
+In this section, switch the instance type from _General purpose_ to _GPUs_. Then list from _GPU type_ drop-down menu and select any of the listed GPUs.
+
+### CPU selection
+
+You can list from available CPU + RAM combinations and select one or, preferably, switch to _Custom_ to adjust the number of vCPUs and amount of RAM by yourself.
+
+:::warning HW availability
+
+* The availability of HW configurations is different across various regions. If your configuration is not available in the specified region, you will be notified and offered an alternative region.
+* Always watch your quotas - the configuration page won't notify you whether the HW specs are within your quotas, e.g. it won't check whether you can create an instance with 64 vCPUs and four GPUs Tesla T4. HW specs and quotas are evaluated once you hit _Create_ button.
+:::
+
+:::note HW recommendation
+
+We recommend starting your testing with the n1-standard-8 (8vCPU, 30GB memory) instance.
+
+Still don't know what HW configuration is best suitable for you? Don't worry, our team will gladly help you out. Contact us at [support@comprimato.com](mailto:support@comprimato.com) and describe your workflow for us.
+:::
+
+## Boot disk
+
+The recommended host OS for Live Transcoder is Ubuntu 24.04 LTS. You can select it by clicking on _Change_ button in the _Boot disk_ section.
+
+For hourly-based streaming (less than 40 hours a month), the capacity of 128 GB will suffice. For HLS streaming (you can check our [storage calculator](../../faq/hls-storage-calculation)) or more extended streaming periods, you should increase the storage size to at least 256 GB.
+
+:::warning
+Make sure to check the _Delete boot disk_ in _Advanced configuration_ options so your quotas for disk space won't get filled up by deleted instances.
+:::
+
+![](/img/cloud-deployment/Screenshot_from_2025-08-12_11-16-01.png)
+
+:::warning
+When using an instance with a smaller storage capacity, it is important to note that a significant portion of the free space is used for storing log messages in the journal. These log messages are crucial for diagnostics. Insufficient space for the journal can limit the ability to diagnose issues with the instance effectively.
+To manage disk space efficiently, ensure you set the correct size for `SystemKeepFree=` and `RuntimeKeepFree=` in `/etc/systemd/journald.conf`.
+:::
+
+## Firewall
+
+It is mandatory to allow HTTP traffic to be able to
+
+* Access the GUI to the Live Transcoder
+* Receive an HLS stream or host the HLS output
+
+Allowing HTTPS is mandatory only if your HLS sources are on secured HTTP.
+
+## Advanced options
+
+### Networking
+
+All the necessary networking/firewall rules are set for a particular network, usually labeled as _default_, before or after the instance is created. You will find an example of firewall rules later in the guide.
+
+### Management
+
+Find the _Automation_ section and paste the following script in it:
+
+```shell
+#!/bin/bash
+
+# log file for nvidia-smi output executed in docker via NVIDIA container toolkit (NTC)
+NTC_NVSMI_OUTPUT_FILE="nvidia-smi-docker.log"
+
+# and log docker-compose version
+DOCKER_COMPOSE_V="docker-compose-version.log"
+
+# if these files exist, the system preparation has been performed
+# do not continue if any of them exist (the preparation might have terminated abruptly)
+if [ -f ${NTC_NVSMI_OUTPUT_FILE} ] || [ -f ${DOCKER_COMPOSE_V} ] ; then
+	exit 0;
+fi
+
+# disable nouveau
+sudo modprobe -r nouveau
+echo "blacklist nouveau" | sudo tee /etc/modprobe.d/blacklist.conf
+
+# update the system and install nvidia packages
+sudo apt-get update -y
+sudo apt install -y nvidia-headless-535 nvidia-utils-535 libnvidia-encode-535
+sudo modprobe nvidia
+
+# download and enable docker
+curl https://get.docker.com | sh && sudo systemctl --now enable docker
+
+# subscribe to NTC repo
+curl -fsSL https://nvidia.github.io/libnvidia-container/gpgkey | sudo gpg --dearmor -o /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg \
+&& curl -s -L https://nvidia.github.io/libnvidia-container/stable/deb/nvidia-container-toolkit.list | \
+sed 's#deb https://#deb [signed-by=/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg] https://#g' | \
+sudo tee /etc/apt/sources.list.d/nvidia-container-toolkit.list
+
+sudo apt-get update
+
+export NVIDIA_CONTAINER_TOOLKIT_VERSION=1.17.7-1
+sudo apt-get install -y \
+  nvidia-container-toolkit=${NVIDIA_CONTAINER_TOOLKIT_VERSION} \
+  nvidia-container-toolkit-base=${NVIDIA_CONTAINER_TOOLKIT_VERSION} \
+  libnvidia-container-tools=${NVIDIA_CONTAINER_TOOLKIT_VERSION} \
+  libnvidia-container1=${NVIDIA_CONTAINER_TOOLKIT_VERSION}
+
+sudo nvidia-ctk runtime configure --runtime=docker
+
+sudo systemctl restart docker
+sudo docker run --rm --runtime=nvidia --gpus all nvidia/cuda:11.6.2-base-ubuntu20.04 nvidia-smi > ${NTC_NVSMI_OUTPUT_FILE}
+
+# setup docker-compose
+sudo curl -L https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m) -o /usr/local/bin/docker-compose
+sudo chmod +x /usr/local/bin/docker-compose
+docker-compose version > ${DOCKER_COMPOSE_V}
+```
+
+This script installs all necessary packages, docker, docker-compose, and NVIDIA container toolkit for your convenience.
+
+:::warning Check the OS compatibility
+
+Make sure you selected **Ubuntu 24.04 LTS** as an Operating system, as the script is being tested and maintained against this operating system only.
+:::
+
+---
+
+With this configuration, you can finally _Create_ the VM Instance and continue by setting up Firewall rules.
+
+## Firewall rules
+
+Navigate from the Google Cloud dashboard to _Compute Engine_ and find _VM Instances_.
+
+Select the _Set up firewall rules_ option.
+
+![](/img/cloud-deployment/Screenshot_2023-05-22_at_10.28.42_AM.png)
+
+There is already a set of rules for your _default_ network which allows you to freely send/receive data between the instances on this particular network.
+
+To allow ingress and egress traffic with world, you have to click on _Create firewall rule_.
+
+Next up:
+
+* Type in the rule's _Name_
+* (Optional) Associate the rule with a particular _Network_
+* Select _Direction of traffic_
+* _Target tags_ to apply the rule only for certain VM instances in the network, or select _All instances in the network_ from the drop-down menu
+* Specify the _Source/Destination IPv4 ranges_, port range, and protocol
+
+Note that you must specify these rules for ingress and egress traffic separately by creating 2 firewall rules.
+
+:::note NDI, SRT and RTMP firewall rules
+
+To allow a network traffic ingress or egress for these protocols, you have to enable traffic via specific TCP and UDP ports, e.g.:
+
+* NDI - Allow TCP and UDP ports in range 5353-7999, as described in [NDI documentation](https://ndi.tv/tools/education/networking/best-practices/networking-best-practice/)
+* SRT (incl. RTP/UDP) - Allow specific range for UDP ports for your MPEG-TS streams in/out, e.g. port range 5000-6000
+* RTMP - Allow TCP port 1935
+:::

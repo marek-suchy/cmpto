@@ -1,0 +1,42 @@
+---
+title: Prerequisites
+sidebar_position: 1
+---
+
+Before launching a VM instance on Google Cloud, complete the following project setup steps.
+
+## 1. Create a Google Cloud Project
+
+1. Go to [cloud.google.com](https://cloud.google.com) and sign in.
+2. Open the Google Cloud Console.
+3. Click the project dropdown at the top and select **New Project**.
+4. Enter a project name and click **Create**.
+
+## 2. Enable Billing
+
+Follow [Google Cloud's official documentation](https://cloud.google.com/billing/docs/how-to/modify-project) to activate billing for your project. A billing account is required to create VM instances.
+
+## 3. Enable the Compute Engine API
+
+1. In the Console, navigate to **APIs & Services** from the left menu.
+2. Click **Enable APIs and Services**.
+3. Search for **Compute Engine API** and enable it.
+
+## 4. Configure Quotas
+
+GPU instances are subject to regional quota limits.
+
+1. Navigate to **IAM & Admin > Quotas**.
+2. Filter by the **Compute Engine** service.
+3. Find quotas for GPUs in your target region.
+4. Request an increase appropriate for your workload.
+
+:::note
+**Minimum:** 4 vCPUs and a single GPU.
+
+Handling a single fully motion-compensated stream at 1920×1080 (50→60 FPS conversion) requires at least **48 vCPUs**.
+:::
+
+## Next Step
+
+Once your project is set up with billing enabled, Compute Engine activated, and regional quotas approved, proceed to [Launch Host Instance](./launch-host-instance).

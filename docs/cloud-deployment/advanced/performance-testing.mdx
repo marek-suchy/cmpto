@@ -1,0 +1,55 @@
+---
+title: Performance Testing
+hide_title: false
+---
+
+All tests run against AWS EC2 instance types, for more information https://aws.amazon.com/ec2/instance-types/
+
+MPEG-TS - NDI Conversion
+
+| Number of pipelines | Input Standard  | Chroma Sub-sampling | Input Protocol | Input Codec | FRC | Output Standard | Chroma sub-sampling | Output Codec | Output Protocol | Recommended AWS Instance |
+| :------------------ | :-------------- | :------------------ | :------------- | :---------- | :-- | :-------------- | :------------------ | :----------- | :-------------- | :----------------------- |
+| 8                   | 1920x1080i50    | 4:2:0 8-bit         | SRT            | H.264       | N/A | 1920x1080i50    | 4:2:0 8-bit         | NDI          | NDI             | g4dn.4xlarge             |
+| 8                   | 1920x1080i59.94 | 4:2:0 8-bit         | SRT            | H.264       | N/A | 1920x1080i59.94 | 4:2:0 8-bit         | NDI          | NDI             | g4dn.4xlarge             |
+| 7                   | 1920x1080p50    | 4:2:0 8-bit         | SRT            | H.264       | N/A | 1920x1080p50    | 4:2:0 8-bit         | NDI          | NDI             | g4dn.4xlarge             |
+| 7                   | 1920x1080p60    | 4:2:0 8-bit         | SRT            | H.264       | N/A | 1920x1080p60    | 4:2:0 8-bit         | NDI          | NDI             | g4dn.4xlarge             |
+| 8                   | 1920x1080i50    | 4:2:0 8-bit         | SRT            | H.265       | N/A | 1920x1080i50    | 4:2:0 8-bit         | NDI          | NDI             | g4dn.4xlarge             |
+| 7                   | 1920x1080i59.94 | 4:2:0 8-bit         | SRT            | H.265       | N/A | 1920x1080i59.94 | 4:2:0 8-bit         | NDI          | NDI             | g4dn.4xlarge             |
+| 7                   | 1920x1080p50    | 4:2:0 8-bit         | SRT            | H.265       | N/A | 1920x1080p50    | 4:2:0 8-bit         | NDI          | NDI             | g4dn.4xlarge             |
+| 7                   | 1920x1080p60    | 4:2:0 8-bit         | SRT            | H.265       | N/A | 1920x1080p560   | 4:2:0 8-bit         | NDI          | NDI             | g4dn.4xlarge             |
+| 4                   | 1920x1080p50    | 4:2:2 10-bit        | SRT            | JPEGXS      | N/A | 1920x1080p50    | 4:2:2 10-bit        | NDI          | NDI             | g4dn.4xlarge             |
+| 4                   | 1920x1080p60    | 4:2:2 10-bit        | SRT            | JPEGXS      | N/A | 1920x1080p60    | 4:2:2 10-bit        | NDI          | NDI             | g4dn.4xlarge             |
+
+MPEG-TS Gateway (No conversion)
+
+| Number of pipelines | Input Standard | Input Protocol | Input Codec | FRC | Output Standard | Output Codec | Output Protocol | Recommended AWS Instance |
+| :------------------ | :------------- | :------------- | :---------- | :-- | :-------------- | :----------- | :-------------- | :----------------------- |
+| 2                   | 1920x1080p60   | SRT            | JPEGXS      | N/A | 1920x1080p60    | JPEGXS       | RTP             | c5.xlarge                |
+| 14                  | 1920x1080p60   | SRT            | H.264       | N/A | 1920x1080p60    | H.264        | RTP             | c5.xlarge                |
+| 14                  | 1920x1080p60   | SRT            | H.265       | N/A | 1920x1080p60    | H.265        | RTP             | c5.xlarge                |
+
+Scan Type Conversion - Interlaced/Progressive
+
+| Number of pipelines | Input Standard  | Chroma Sub-sampling | Input Protocol | Input Codec | FRC | Output Standard | Chroma sub-sampling | Output Codec | Output Protocol | Recommended AWS Instance |
+| :------------------ | :-------------- | :------------------ | :------------- | :---------- | :-- | :-------------- | :------------------ | :----------- | :-------------- | :----------------------- |
+| 4                   | 1920x1080i50    | 4:2:0 8-bit         | SRT            | H.264       | N/A | 1920x1080p50    | 4:2:0 8-bit         | H.264        | RTP             | g4dn.4xlarge             |
+| 4                   | 1920x1080i59.94 | 4:2:0 8-bit         | SRT            | H.264       | N/A | 1920x1080p59.94 | 4:2:0 8-bit         | H.264        | RTP             | g4dn.4xlarge             |
+| 4                   | 1920x1080p50    | 4:2:0 8-bit         | SRT            | H.264       | N/A | 1920x1080i50    | 4:2:0 8-bit         | H.264        | RTP             | g4dn.4xlarge             |
+| 4                   | 1920x1080p60    | 4:2:0 8-bit         | SRT            | H.264       | N/A | 1920x1080i60    | 4:2:0 8-bit         | H.264        | RTP             | g4dn.4xlarge             |
+
+Frame-rate conversion
+
+| Number of pipelines | Input Standard | Chroma Sub-sampling | Input Protocol | Input Codec | FRC                      | Output Standard | Chroma sub-sampling | Output Codec | Output Protocol | Recommended AWS Instance |
+| :------------------ | :------------- | :------------------ | :------------- | :---------- | :----------------------- | :-------------- | :------------------ | :----------- | :-------------- | :----------------------- |
+| 1                   | 1920x1080i50   | 4:2:0 8-bit         | SRT            | H.264       | Fully Motion Compensated | 1920x1080i59.94 | 4:2:0 8-bit         | H.264        | RTP             | c5a.16xlarge             |
+| 1                   | 1920x1080p50   | 4:2:0 8-bit         | SRT            | H.264       | Fully Motion Compensated | 1920x1080p60    | 4:2:0 8-bit         | H.264        | RTP             | g5.16xlarge              |
+| 1                   | 1920x1080i50   | 4:2:2 10-bit        | SRT            | JPEGXS      | Fully Motion Compensated | 1920x1080i59.94 | 4:2:2 10-bit        | JPEGXS       | RTP             | c5a.16xlarge             |
+| 1                   | 1920x1080p50   | 4:2:2 10-bit        | SRT            | JPEGXS      | Fully Motion Compensated | 1920x1080p60    | 4:2:2 10-bit        | JPEGXS       | RTP             | c5a.16xlarge             |
+| 1                   | 3840x2160p50   | 4:2:2 10-bit        | SRT            | JPEGXS      | Fully Motion Compensated | 3840x2160p60    | 4:2:2 10-bit        | JPEGXS       | RTP             | c5a.24xlarge             |
+| 8                   | 1920x1080i50   | 4:2:0 8-bit         | SRT            | H.264       | Linear Conversion        | 1920x1080i59.94 | 4:2:0 8-bit         | H.264        | RTP             | c6a.32xlarge             |
+
+MPEG-TS Codec cross-conversion
+
+| Number of pipelines | Input Standard | Chroma Sub-sampling | Input Protocol | Input Codec | FRC | Output Standard | Chroma sub-sampling | Output Codec | Output Protocol | Recommended AWS Instance |
+| :------------------ | :------------- | :------------------ | :------------- | :---------- | :-- | :-------------- | :------------------ | :----------- | :-------------- | :----------------------- |
+| 8                   | 1920x1080p60   | 4:2:0 8-bit         | SRT            | H.264       | N/A | 1920x1080p60    | 4:2:0 8-bit         | H.265        | RTP             | g4dn.4xlarge             |

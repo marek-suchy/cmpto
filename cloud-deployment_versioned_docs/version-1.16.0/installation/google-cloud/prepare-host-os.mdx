@@ -1,0 +1,104 @@
+---
+title: Prepare Host OS
+sidebar_position: 3
+---
+
+This guide covers the required configuration steps after your Google Cloud VM is running.
+
+:::note
+Before connecting via SSH, **wait a few minutes** for the automated startup script to finish installing and configuring Docker, NVIDIA drivers, and the NVIDIA Container Toolkit.
+:::
+
+## 1. Grant Non-Root Docker Access
+
+Add your user to the `docker` group to allow running Docker commands without `sudo`:
+
+```bash
+sudo usermod -aG docker $USER
+newgrp docker
+```
+
+## 2. Enable Coredumps
+
+Install the systemd coredump handler for diagnostics:
+
+```bash
+sudo apt install systemd-coredump -y
+```
+
+## 3. Disable mDNS (if using NDI Discovery servers)
+
+If you plan to use NDI Discovery servers, disable the host mDNS daemon to prevent conflicts:
+
+```bash
+sudo systemctl stop avahi-daemon
+sudo systemctl disable avahi-daemon
+```
+
+## 4. Increase UDP Kernel Buffer Sizes
+
+For high-bitrate streaming, increase the UDP receive and send buffer limits:
+
+```bash
+sudo sysctl -w net.core.rmem_max=262144000
+sudo sysctl -w net.core.wmem_max=262144000
+```
+
+To persist these settings across reboots, add them to `/etc/sysctl.conf`:
+
+```
+net.core.rmem_max=262144000
+net.core.wmem_max=262144000
+```
+
+## 5. Configure Docker cgroup Mode
+
+Edit `/etc/docker/daemon.json`:
+
+```bash
+sudo nano /etc/docker/daemon.json
+```
+
+Add or merge:
+
+```json
+{
+  "default-cgroupns-mode": "host"
+}
+```
+
+Restart Docker:
+
+```bash
+sudo systemctl restart docker
+```
+
+## 6. Increase txqueuelen (High-Bitrate Codecs)
+
+For high-bitrate codecs such as JPEG2000 and JPEG-XS, increase the transmit queue length on network interfaces. Create a persistent udev rule:
+
+```bash
+sudo nano /etc/udev/rules.d/99-txqueuelen.rules
+```
+
+Add:
+
+```
+ACTION=="add", SUBSYSTEM=="net", KERNEL=="eth*", RUN+="/sbin/ip link set %k txqueuelen 10000"
+```
+
+Apply immediately:
+
+```bash
+sudo ip link set eth0 txqueuelen 10000
+```
+
+## 7. Create a Reusable Machine Image (Optional)
+
+After completing setup, you can create a Google Cloud Machine Image from this instance. This allows you to spawn additional pre-configured instances without repeating these steps.
+
+Navigate to **Compute Engine > Machine Images** and create an image from your configured instance.
+
+## Next Step
+
+Proceed to [Run Docker Container](../../run/run-docker-container) to deploy Live Transcoder.

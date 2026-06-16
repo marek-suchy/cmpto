@@ -1,0 +1,376 @@
+---
+title: Pipeline configuration
+sidebar_label: Pipeline configuration
+---
+
+# 3.0 Pipeline configuration
+
+**The bottom left corner has a button to add a new pipeline**. Once you click it, you are redirected to the setup window. **This dialogue is the same as when you choose to change the configuration of an existing pipeline**. Click on a pipeline you want to change, and you will be forwarded to the settings window as depicted.
+
+*Figure: PIPELINE OVERVIEW*
+
+## 3.1 Input configuration and detection
+
+Figure 21 shows a dialogue window to select the input stream source type. You can choose the input type.
+
+*Figure: INPUT STREAM TYPE SELECTION*
+
+Live Transcoder can automatically distinguish MPEG-TS streams carried over plain UDP from those carried over RTP.
+
+**For network data, you need to select the network interface and enter the IP address and port number ****at**** which data are received**. An example configuration is shown in Figure 22. **The video configuration covers basic parameters **such as resolution, bit depth, color sampling and frame rate. For SRT configuration, see section 4.0 of this document. For MPTS configuration, see section 3.2 of this document. For RTMP(S) configuration, see section 5.0 of this document.
+
+*Figure: INPUT NETWORK STREAM CONFIGURATION*
+
+Live Transcoder can auto-detect the incoming video signal. When configuring a new pipeline, first select the appropriate Input stream source type with a valid IP:port combination on the correct ethernet card. Set the Compliance with field to Auto-detected and click on **Apply configuration** in the right bottom corner of the web page. This confirmation will trigger the auto-detection system. Following, below the Input stream source fields, you will see the detected input stream. The settings are automatically filled into configuration fields if you click on the detected line.
+
+In the background, the system performs a check on whether the auto-detected parameters match the user input. If these do not match correctly, an error will be displayed once you try to apply the faulty configuration.
+
+If you need to use a PCR synchronization from a different source than the MPEG Transport Stream you are processing, you can do so by checking the Input stream PCR source box and filling out the configuration.
+
+*Figure: INPUT STREAM PCR SOURCE*
+
+## 3.2 SMPTE 2022-7 input
+
+Using RTP, it’s possible to configure redundant input paths (SMPTE 2022-7) to avoid potential data loss on unreliable networks or long-distance content transfers. To configure redundant paths, enable the **SMPTE 2022-7 Redundancy** checkbox and fill in the specific NIC, IP address, SSM (Source-Specific Multicast), and ports for both the primary and redundant paths. The primary path is always preferred in the event of a data mismatch between the paths.
+
+Based on your network environment, you can configure the **Jitter buffer length** (expressed as a skew or difference between both paths in ms). This value should account for the maximum expected jitter packets from both paths might experience, including a safety headroom. The default value is 10 ms, which is sufficient for LAN and inter-facility links. For long-haul links or environments with higher relative delay, values up to approximately 100 ms may be used. The allowed range is 1 to 400 ms. Increasing this value improves tolerance to delay variation but increases overall processing latency.
+
+See Figure 23.
+
+*Figure: INPUT SMPTE 2022-7 CONFIGURATION*
+
+## 3.3 De-Multiplexing & Muxing
+
+You can add more sources in tabs, like the browser would open another browser tab. The maximum count of sources (tabs) is limited to value 4. **Video is always used from the first source.** **The others are only for audio and metadata.**
+
+*Figure: DE-MULTIPLEX INPUTS*
+
+We provide synchronization across tabs and all inputs should be MPEG-TS-based (RTP, UDP, SRT).
+
+Live Transcoder is also **capable of muxing multiple streams** such as audio inputs, captions, and metadata streams into a single output stream. Currently, the list of supported input data is as follows:
+
+Video:
+
+Generic single program MPEG transport stream
+
+encapsulation – standard TR01, Evertz TR01, MediaLinks TR01, legacy NetInsight TR01
+
+JPEGXS – 4:2:2, 10-bit, up to 3840x2160p60/i60
+
+high-bitrate JPEG2000 – 4:2:2, 10bit, up to 3840x2160p60/i60
+
+H262 – 4:2:0, 8bit, up to 3840x2160p60/i60
+
+H264 – 4:2:2/4:2:0, 8bit/10bit, up to 3840x2160p60/i60
+
+H265 – 4:2:0, 8bit/10bit, up to 3840x2160p60
+
+Audio:
+
+AES3 uncompressed (SMPTE 302M)
+
+MPEG2 audio
+
+AAC (ADTS, LATM)
+
+AAC-HE V1/2 (ADTS, LATM)
+
+AC3
+
+E-AC3
+
+Closed Captions:
+
+SMPTE 2038 (608/708)
+
+Metadata:
+
+LTC timestamps
+
+MPEG TS PCR
+
+SCTE35 pass-through
+
+pass-through capabilities
+
+## 3.4 MPTS for choosing the right program
+
+MPTS (MPEG transport stream) is used in broadcast systems and is designed to be used in terrestrial or satellite broadcasts, for example. It can carry multiple programs and each program contains a pack of video streams, audio streams and metadata (if present).
+
+Comprimato Live Transcoder has the support for receiving and processing the MPTS streams and detects all programs and allows its users to choose them easily.
+
+*Figure: CONFIGURING MPTS*
+
+When you wish to choose which program to use, you need to allow the Program number configuration in the Input stream configuration options. Once allowed, the user can select the program number from a dropdown menu. The current program informs about the current configuration, while the Configured program has to be applied first to take effect. If you will not set up anything, the first program in the list is selected. If a Configured program number is not present in the stream, Live Transcoder reports an error. Once you change the program number and apply the configuration, a video with another PID is detected (if present).
+
+## 3.5 Auto reconfiguration
+
+Live Transcoder allows the auto reconfiguration of the pipelines. It means it can automatically restart a pipeline when it detects a change in the parameters of the input video or audio. The video outputs are kept unchanged, the behaviour of audio outputs is described later. The auto reconfiguration can be turned on by a checkbox (Figure 26).
+
+*Figure: AUTO RECONFIGURATION ENABLING*
+
+## 3.6 Auto reconfiguration of Audio outputs
+
+There are three modes of output audio channel layout. Passthrough, Pairs and Quads. They can be selected in the dialog window, which can be opened in the Output stream audio configuration options section. (Figure 27)
+
+**Warning:** The audio mode is applied for all outputs of one pipeline!
+
+*Figure: OUTPUT AUDIO STREAM OPTION DIALOG OPEN*
+
+Passthrough – In this case, all input audio attributes will be kept and set on the audio output, preserving the original channel layout.
+
+Pairs – In this case, the input audio attributes will be changed. The audio/s channels will be separated into up to 8 audio pairs. E.g., for input audio with six channels, the Live Transcoder will produce three audios with stereo sound (2 channels) each.
+
+Quads – Similar mode to Pairs, but in this case, the Live Transcoder creates up to four audio outputs, with four channels each from the main input. Unused channels are silent. E.g., for input audio with six channels, the first output will have four channels with sound, the second audio will have two channels with sound and the remaining two channels will be silent.
+
+*Figure: OUTPUT AUDIO AUTO RECONFIGURATION TYPE SELECTOR*
+
+## 3.7 Video Corrections
+
+Live Transcoder allows you to configure color corrections for your pipeline. In the input stream configuration, click on the “Configure video corrections” button, and you will see the following window pop-up. Keep in mind that this configuration is valid for every output stream within the pipeline.
+
+*Figure: VIDEO CORRECTION*
+
+## 3.8 Audio corrections
+
+Live Transcoder allows you to configure audio corrections for your pipeline. In the input stream configuration, click on the “Configure audio corrections” button, and you will see the following window pop-up. Keep in mind that this configuration is valid for every output stream within the pipeline.
+
+*Figure: AUDIO CORRECTIONS*
+
+Passthrough – If checked, the audio stream will be transferred to the output stream without any transformations or encoding.
+
+Volume gain – A value in % used to increase or decrease volume of the audio stream.
+
+Delay – A value in milliseconds used to shift audio streams in time back or forward. Positive values delay the audio, while negative values advance it. High negative values may require adjustment of the latency addition on output.
+
+## 3.9 Output Configuration
+
+Figure 31 depicts the dialogue window for output streams settings. **When adding an output stream, it’s a good practice to name it explicitly to eliminate any confusion.**. Besides the mandatory options to direct the output to a specific network interface and a remote node, these settings have more attributes that impact the quality of the resulting stream.
+
+*Figure: OUTPUT CONFIGURATION*
+
+## 3.11 Manual Low Latency Adjustments
+
+Latency addition is the offset applied to the PTS for reliable transmission to the receiving decoder. The offset is calculated by the overall configuration of the pipeline. The latency addition field allows for the manual adjustment of this offset. This field is available on all MPEG-TS outputs within Live Transcoder.
+
+*Figure: LATENCY ADDITION*
+
+It is recommended to obtain a baseline figure before adjusting the latency addition manually using the Live Transcoder REST API:
+
+Use the following GET command to obtain the pipeline statistics when a pipeline is active: http://hostIPaddress/api/pipeline/0/state
+
+Look for the field “transcodingLatency”
+
+Transcoding Latency is the real time figure of the pipeline, you cannot set the latency addition lower than this.
+
+It is recommended to add 40-50ms+ of the transcoding latency in the Latency Addition field and restart the pipeline
+
+It is best to test using complex content, as this will need more time to encode. If you notice frame drop errors then the Latency Addition will need to be increased.
+
+## 3.12 MPEG-TS output
+
+The output mode (CBR, VBR, CVBR) selects the transmission strategy. For CBR (constant bitrate), Total bitrate field can be set to ensure exact constant network traffic. In VBR (variable bitrate) mode, the transmission corresponds exactly to the amount of data currently produced. With the CVBR (capped VBR), the transmission also corresponds to the amount of data being produced, but won’t exceed the given value in Total bitrate.
+
+**Be aware that this attribute has a direct impact on the resulting quality** – the lower the allowed bitrate, the worse the quality of transmitted data. **This attribute combines the sum of video, audio, and remaining bitrates**.
+
+You can also limit the total video bitrate, which will define which part of the total bitrate is dedicated to video data. In different scenarios, it is necessary to adjust the total bitrate overhead over the video bitrate.
+
+You can choose whether you want PCR synchronization to be included in a video stream, or in a standalone elementary stream within the Transport Stream. It is useful to have it by itself, if you need to have unified PCR synchronization for multiple streams, so in that case it would serve as a “master” PCR for other streams.
+
+With the EBP setting, you define the parameter for Encoder Boundary Point insertion, which is often used in ABR streaming. Following is the section for video preferences where you define the resolution, video bitrate and frame rate.
+
+It is possible to encapsulate the JPEG2000 transport stream in compliance with the standard (TR01) or with legacy Evertz receivers.
+
+## 3.13 SMPTE 2022-7 output
+
+Using RTP, it’s possible to configure redundant **output** paths (SMPTE 2022-7) to avoid potential transmission loss on unreliable networks or long-distance content transfers. To configure redundant paths, use the **Stream destination** dialog to set up two paths according to your network layout.
+
+See Figure 36.
+
+*Figure: OUTPUT SMPTE 2022-7 CONFIGURATION*
+
+## 3.14 MPEG-TS & RTMP Destinations
+
+Twenty-One Encoder allows for dynamic modification of destinations for MPEG-TS & RTMP output streams without requiring a pipeline restart. This capability ensures that changes can be made to one destination without affecting others that are currently active.
+
+**Viewing Current Stream Destinations**
+
+You can view the list of currently configured destinations on the main Output stream options page.
+
+The destinations are listed in a table under the Stream destinations heading (Figure 33).
+
+To modify these destinations, click the Configure destinations link, which will open the destination editing dialog window
+
+Figure 33: Stream Destinations Table
+
+### Modifying Stream Destinations at Runtime
+
+The Stream destinations dialog window allows you to configure how the MPEG-TS output is routed (Figure 34).
+
+In this dialog, you can make changes such as adding, removing, changing, disabling, or enabling individual destinations.
+
+Figure 34: Stream Destinations Dialogue
+
+**Applying Changes**
+
+When the new destination configuration can be applied without interrupting the pipeline, the confirmation button at the bottom of the dialog will read Apply changes without restart (Figure 35).
+
+Figure 35: Stream Destinations Apply Changes
+
+Review all desired changes within the Stream destinations dialog window.
+
+Click the Apply changes without restart button.
+
+The system will apply the changes immediately. Processing and streaming to any destinations that were not modified will continue uninterrupted.
+
+## 3.15 MPEG-TS Video passthrough
+
+Live Transcoder has the ability to pass through MPEG-TS without decoding or encoding the video. This is known as video pass through. This is useful for operators that wish to re-encapsulate to/from SRT/UDP/RTP or use Live Transcoder as a one to many device, somewhat like a video IP router.
+
+To configure video passthrough, select “Start Detecting Input”, Live Transcoder will detect what the incoming streams video parameters are. Then select “Set As Input” under the Auto Detected Video Streams. Now when an output stream is created, the video settings will be applied automatically. These will need to be the same as the input to allow for video passthrough. To finish the configuration apply a video bitrate of 0 under the output video configuration settings, and input a total bitrate for the transport stream under the output stream options.
+
+If the output settings for the video are not the same, the following warning will be seen:
+
+*Figure: VIDEO PASSTHROUGH WARNING*
+
+Multiple destinations can be configured to allow a one to many use case. Transport stream encapsulation can also be changed.
+
+## 3.16 MPEG-TS/RTMP Audio only streams
+
+Live Transcoder has the ability to create audio only MPEG-TS and RTMP(S) streams. When creating the output stream, there is a tick box to allow video:
+
+*Figure: VIDEO DISABLE*
+
+Audio must be either passed through or manually mapped before unticking this box. Once the box is unticked the stream will contain only audio elementary stream(s).
+
+## 3.17 Service ID in MPEG-TS output
+
+By clicking on the “Configure service description”, it’s possible to configure several MPEG-TS specifications of the output:
+
+Transport stream ID – A unique 16-bit identifier for this Transport Stream. Used in PAT and SDT tables to distinguish streams within a network. If left empty, a default unspecified ID will be used.
+
+Program number – A 16-bit identifier for the service within the Transport Stream. Called 'service_id' in SDT/PMT and 'program_number' in PAT. If left empty, the value is passed through from the input (if MPEG-TS), or a default unspecified value is used for non-MPEG-TS inputs.
+
+Service name – The name of the service (e.g., TV channel) shown to users. Limited to 24 characters. If left empty, the SDT table will not include service name information.
+
+Service provider name – The name of the company or organization providing this service. Limited to 24 characters. If left empty, the SDT table will not include provider name information.
+
+## 3.18 MPEG-TS video codecs
+
+Available are settings for the chosen video codec that define quality vs. speed difference:
+
+H.262
+
+Profile – Simple, Main, High
+
+GOP size – the distance between two I-frames
+
+B count – number of B-frames between two P-frames
+
+H.264
+
+Coding – CABAC, CAVLC
+
+Profile – Baseline, Main, High
+
+Refresh mode – IDR
+
+Every GOP starts with an IDR I-frame containing the whole picture
+
+GOP size – the distance between two I-frames
+
+B count – number of B-frames between two P-frames
+
+Refresh mode – GDR (intra-refresh)
+
+At the start of each Refresh Period, the encoder inserts Refresh Count P-frames, each refreshing a portion of the picture (one row in NVEnc, one column in the CPU encoder). The remainder of the period consists of regular P-frames. There are no I-frames or B-frames.
+
+Use it to avoid bitrate spikes
+
+Refresh Period – the distance (frames) between two intra refreshes
+
+Refresh Count – number of frames used to refresh the whole picture. Must be equal to or less than Refresh Period. CPU encoder requires Refresh Count to equal Refresh Period.
+
+H.265
+
+Profile – Main10, Main
+
+GOP size – the distance between two I-frames
+
+B count – number of B-frames between two P-frames
+
+In case you need multiple similar output streams within one pipeline, you can clone the output stream by hovering over the stream’s name in the middle pane and clicking on the cloned symbol.
+
+*Figure: OUTPUT STREAM MOUSE OVER*
+
+## 3.19 Cropping, Padding and scaling
+
+Live Transcoder allows you to choose how you want to deal with the resolution change. In the output stream configuration, you can click on the Configure cropping and padding button and you will see the setup dialogue for it.
+
+*Figure: CROPPING/PADDING CONFIGURATION*
+
+## 3.20 Logo insertion
+
+Users can configure Logo insertion in the “Output stream video configuration options” section, by clicking the “Output stream video configuration options” button, which can be seen in Figure 40.
+
+*Figure: LOGO INSERTION BUTTON*
+
+Upon clicking it, we are presented with another pop-up window, which the user can set up, as seen in Figure 41.
+
+*Figure: LOGO INSERTION CONFIGURATION*
+
+First, a **logo** **file in the .png format** must be uploaded and selected. After that, the user can choose to position the logo either in pixels, or set its positions using percent. If for some reason a logo has to have an adjusted scale, it’s possible to do it using the Logo scaling option.
+
+If you save a pipeline that uses the Logo insertion function and has a logo uploaded as a preset, it will be saved with the logo file, too.
+
+## 3.21 Audio & Metadata mapping
+
+**While configuring the output stream you can also choose which transmitted audio or metadata channels you wish to include.** The configurator is shown in **Figure 42**
+
+*Figure: AUDIO MAPPING*
+
+*Figure: LOGO INSERTION CONFIGURATION*
+
+Here you can see one tab with 2 audios. You need to manually add all audio channels from each source
+
+If you hover your mouse cursor over the output audio stream name, you will be given the option to clone the output, in case you need to create a similar one.
+
+*Figure: AUDIO MOUSE OVER*
+
+Currently, the list of supported output data in a single program transport stream:
+
+Video:
+
+H.262 – 4:2:0, 8bit, up to 3840x2160p60/i60
+
+H.264 CPU – 4:2:2/4:2:0, 8bit/10bit, baseline/main/high profile, up to 3840x2160p60/i60
+
+H.264 GPU - 4:2:0, 8bit, main/high profile, up to 3840x2160p60/i60
+
+H.265 GPU – 4:2:0, 8/10bit, main/main10 profile, up to 3840x2160p60
+
+JPEG2000 GPU – 4:2:0/4:2:2, 8bit/10bit, up to 3840x2160p60/i60
+
+Encapsulation – standard TR01 and Evertz
+
+JPEGXS CPU – 4:2:2, 10-bit, up to 3840x2160p60/i60
+
+Audio:
+
+AAC (ADTS, LATM)
+
+AAC-HE V1/2 (ADTS, LATM)
+
+AC3 up to 6 channels
+
+AES3
+
+MPEG 2
+
+Closed Captions:
+
+H.264 insertion
+
+Metadata:
+
+LTC insertion, SCTE 35 passthrough, Teletext, DVB Subtitles, Other Pass-through

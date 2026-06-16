@@ -1,0 +1,175 @@
+---
+title: Bridge Live — Specifications
+sidebar_label: Bridge Live
+hide_title: true
+---
+
+# Bridge Live
+
+<p className="resource-spec__meta">1RU broadcast-quality, low-latency turnkey system for REMI, contribution, and streaming — developed by AJA and Comprimato</p>
+
+## SDI Video Formats
+
+### Bridge Live 12G-4
+
+| Format | Frame rates |
+|---|---|
+| UltraHD 3840×2160p | 23.98, 24, 25, 29.97, 30, 50, 59.94, 60 |
+| 2K 2048×1080p | 23.98, 24, 25, 29.97, 30, 47.95, 48, 50, 59.94, 60 |
+| HD 1080p | 23.98, 24, 25, 29.97, 30, 50, 59.94, 60 |
+| HD 1080i | 50, 59.94, 60 |
+| HD 720p | 50, 59.94, 60 |
+| SD 625i | 50 |
+| SD 525i | 59.94 |
+
+SDI standards: 12G-SDI (SMPTE ST 2082), 6G-SDI* (SMPTE ST 2081), 3G-SDI (SMPTE ST 424), 1.5G-SDI (SMPTE ST 292M), 270 Mbit/s SDI (SMPTE ST 259M-C) — all 10-bit.
+
+*Only UltraHD 2160-line single link supported.
+
+### Bridge Live 3G-8
+
+| Format | Frame rates |
+|---|---|
+| HD 1080p | 23.98, 24, 25, 29.97, 30, 50, 59.94, 60 |
+| HD 1080i | 50, 59.94, 60 |
+| HD 720p | 50, 59.94, 60 |
+| SD 625i | 50 |
+| SD 525i | 59.94 |
+
+SDI standards: 3G-SDI (SMPTE ST 424), 1.5G-SDI (SMPTE ST 292M), 270 Mbit/s SDI (SMPTE ST 259M-C) — all 10-bit.
+
+## Video Color Component Sampling
+
+| Source | Sampling |
+|---|---|
+| SDI | YCbCr, 4:2:2, 10-bit |
+| Transport Streams | YCbCr, 4:2:2 or 4:2:0, 10-bit/8-bit |
+| NDI | P216 4:2:2 16-bit; UYVY 4:2:2 8-bit |
+
+## Video Codecs
+
+- H.264 (AVC, MPEG-4)
+- H.265 (HEVC)
+- JPEG 2000 (VSF TR-01)
+- H.262 (MPEG-2)
+- NDI
+- JPEG XS (VSF TR-07)
+
+## Audio Streams / Codecs
+
+| Codec | Notes |
+|---|---|
+| AAC-LC | ADTS, LATM |
+| AAC-HE | ADTS, LATM |
+| AAC-HE v1 & v2 | ADTS, LATM |
+| AC-3 | — |
+| E-AC-3 | input |
+| Dolby-E | pass-through |
+| MPEG-2 Audio | — |
+| NDI | uncompressed float |
+| Uncompressed PCM | SMPTE ST 302M-2007, multichannel |
+
+## Audio I/O
+
+| | Details |
+|---|---|
+| Audio input (digital) | 16-channel, 16 and 24-bit SDI embedded audio, 48 kHz, synchronous per SDI connection |
+| Audio output (digital) | 16-channel, 16 and 24-bit SDI embedded audio, 48 kHz, synchronous per SDI connection |
+
+## Metadata
+
+- MPEG-2 ancillary packet support (SMPTE ST 2038)
+- HDR over SDI end-to-end via VPID signaling (SDR/HDR Transfer Characteristics, Colorimetry, Luminance)
+- Closed Captioning (EIA-608/708), Line 21 Captions
+- Metadata pass-through
+- SCTE-35, SCTE-104
+- Subtitles embedded within H.264 SEI messages
+- Timecode embedded within HEVC and H.264 SEI messages
+- Electronic program guide (EPG) on input
+
+## Containers & Protocols
+
+| Protocol / Container | Notes |
+|---|---|
+| HLS (input) | AVC TS segments, Fragmented MP4 |
+| HLS (output) | AVC TS segments |
+| MPEG-TS / MPTS | input |
+| RTMP | — |
+| RTMPS | output |
+| RTP, UDP | — |
+| SRT | including encryption |
+| VSF TR-01 | — |
+| VSF TR-07 | — |
+
+## Video Processing
+
+- Auto Color Component Sampling based on I/O settings
+- Cropping / Padding
+- Color adjustments
+- De-interlacing
+- Frame rate 50% down-conversion (60p→30p, 59.94→29.97, 50p→25p)
+- Frame rate up-conversion (50i→50p)
+- Logo insertion
+- Resizing
+
+## Audio Processing
+
+- Channel remapping
+- Gain
+- Sample rate conversion
+- Up/down-mixing (e.g., 5.1 to stereo and vice versa)
+
+## Synchronization
+
+| Parameter | Options |
+|---|---|
+| Input PCR | Global (separate transport stream) or Local (per transport stream) |
+| Output PTS | Pass-through or add offset to input PTS |
+| NTP / PCR | — |
+| Encoder synchronous multi-channel transport | — |
+| Decoder synchronous multi-channel transport | — |
+
+## Configuration & Monitoring
+
+- Local "Kiosk" interface (keyboard, mouse, and monitor)
+- Remote access via browser
+- REST API
+- SNMP
+
+## Hardware Specifications
+
+### Bridge Live 12G-4 Form Factor
+
+| Parameter | Value |
+|---|---|
+| Chassis | 1RU turnkey system |
+| SDI I/O | 4× full-size BNC (12G/6G/3G/1.5G-SDI compatible) |
+| Network | 2× 10 GigE |
+| Local interface | Display Port and USB |
+
+### Bridge Live 3G-8 Form Factor
+
+| Parameter | Value |
+|---|---|
+| Chassis | 1RU turnkey system |
+| SDI I/O | 8× DIN 1.0/2.3 (3G-SDI compatible) |
+| Network | 2× 10 GigE RJ-45 |
+| Local interface | Display Port and USB |
+
+### Physical & Electrical
+
+| Parameter | Value |
+|---|---|
+| Size (W × D × H) | 17.2" × 16.9" × 1.7" (436.88 × 429.26 × 43.18 mm) |
+| Weight (boxed) | 28 lb (12.7 kg) |
+| Weight (unit only) | 18 lb (8.2 kg) |
+| Power | 100–240 VAC, 50/60 Hz, dual redundant — 190 W typical, 245 W max |
+
+### Environment
+
+| Parameter | Value |
+|---|---|
+| Safe operating temperature | 5°C to 35°C (41°F to 95°F) |
+| Safe storage temperature | −40°C to 60°C (−40°F to 140°F) |
+| Operating relative humidity | 8%–90% non-condensing |
+| Non-operating relative humidity | 5%–95% non-condensing |

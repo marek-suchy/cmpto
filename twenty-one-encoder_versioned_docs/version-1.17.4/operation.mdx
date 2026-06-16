@@ -1,0 +1,246 @@
+---
+title: Twenty-One Encoder Operation
+sidebar_label: Twenty-One Encoder Operation
+---
+
+# 2.0 Twenty-One Encoder Operation
+
+Comprimato Twenty-One Encoder is **enriched with an easy-to-use web-based user interface which is the primary environment users should use**. By default, the Twenty-one encoder starts this UI with every boot. Here, the main configuration takes place as well as monitoring tools present the data.
+
+There are two ways to access the UI:
+
+**Locally - being physically present within the server location and using kiosk mode via Display Port 1 (in case there is a monitor connected to the machine).**
+
+**Remotely - using the assigned administration interface IP address in your web browser to remotely connect to administration.**
+
+## 2.1 Dashboard
+
+In figure 3 you can see the main UI screen called **Dashboard**. This can be accessed by clicking on the Comprimato logo in the top-right corner of the UI. On this page, you can overview the performance of the system in terms of utilization:
+
+**CPU / selected GPU utilization**
+
+**GPU / RAM memory**
+
+**Selected Network Interface data throughput**
+
+**Rx – received traffic**
+
+**Tx – transmitted, i.e., sent, traffic**
+
+Service and device statuses
+
+REST API service
+
+SSH daemon
+
+License server
+
+PTP synchronization
+
+HW temperatures
+
+In addition to the aforementioned, in the bottom part, you can see a list of all existing streams – both input and output. In case an error occurs, the particular line will turn red to notify you about it. Once you hover over a line with your cursor the system will give you an error message as shown in Figure 4.
+
+Besides the list of all streams, the **left-hand side of the UI presents all configured existing input streams** (we use the term ‘Pipeline’). If you access a Pipeline by clicking on it, inside you will see the list of configured output streams for that particular input.
+
+Next to the name of a pipeline, you can see a pictogram that serves as a reference to show you:
+
+**Grey – the pipeline is stopped**
+
+**Red – input (left half)/output (right half) stream is not working correctly**
+
+**Green – input (left half)/output (right half) stream is working correctly**
+
+*Figure: TWENTY-ONE ENCODER UI – STREAM ERRORS*
+
+For every pipeline, there’s also information on license status. A pipeline may or may not be granted a license to run.
+
+When you hover your mouse over a pipeline in the left pane, an option to open a submenu appears. Once you click on the symbol with three dots, the submenu opens.
+
+*Figure: PIPELINE MOUSEOVER*
+
+In the submenu, you can download the pipeline configuration, create a clone of it or delete it.
+
+*Figure: PIPELINE SUBMENU*
+
+Once you have created every pipeline you need, you can easily back up all of them by opening the management menu and selecting the option Download all as a preset. Similarly, you can upload previously saved configuration using the option Upload a preset.
+
+*Figure: PIPELINE MANAGEMENT MENU*
+
+## 2.2 Licensing
+
+Twenty-one encoder web interface features Licensing page for managing loaded licenses, through Licensing link (top right).
+
+In the Licenses frame, the page shows the total licensed streams count and offers a detailed view of each license, its included stream count and its validity. It’s also possible to remove individual loaded licenses (red cross button on the right side), get a license request and load a new license file.
+
+*Figure: TWENTY-ONE ENCODER LICENSING*
+
+If there’s any problem (e. g. a stream isn’t granted a license because none is available), a Problems frame will show with a description of the problem.
+
+*Figure: TWENTY-ONE ENCODER LICENSE ERROR*
+
+## 2.3 Demo license
+
+Comprimato offers demo licenses for testing purposes for a limited time. The demo license may be loaded with the Load license file button (right) and will allow unlimited functionality for streams. If you need more time for testing your use cases, you may contact Comprimato support and request another demo license.
+
+If a license is granted, the status shows “Unlimited time” or the time for which the pipeline can produce an output, according to loaded license files (see section 2.2). The status will be for example:
+
+**License: Unlimited time – a pipeline may produce an output for unlimited time.**
+
+**License: Till 2021-02-21 23:59:59 – a pipeline will produce an output until the displayed time point is passed (please note that for your convenience, the status shows the time and date according to your computer (i.e., browser) time, not the twenty-one encoder system time, which may be different).**
+
+If the pipeline is not allowed to produce an output, the license status reads “Blocked” or “Unavailable” and is shown red. Twenty-one Encoder will process the pipeline as usual, the only difference is that the output will not be sent to defined output destinations. This feature will help you verify your environment abilities (e. g. system load limits, input stream compliance and others) even if you do not have enough licenses yet. For that reason, the input and output stream status indicator may be green even if the license status is not valid.
+
+Possible invalid license statuses are:
+
+**License: Blocked – there are licenses for the stream loaded in the system, but the count of streams would exceed the licensed number (other streams have exhausted the available licenses)**
+
+**License: Unavailable – the stream needs a license that is not loaded (the stream contains a feature of a newer version of Twenty-one encoder which isn’t included in any loaded license)**
+
+## 2.4 Perpetual license and licensable features
+
+A sold Twenty-One Encoder appliance will contain a perpetual license for the end user. This license will be unlimited regarding duration and pipeline count. However some features, such as JPEG-XS & JPEG2000 will be restricted unless included in the license. Please contact Comprimato Support or your reseller for more information.
+
+## 2.5 System information
+
+There is an option to display a list of facts regarding the System, such as software version, drivers, and hardware. You can **open this view by clicking on the Setup > System Information **in the upper right corner.
+
+.The System Information page displays the following information:
+
+Software version
+
+Service statuses
+
+Network interfaces and IP addresses, link statuses and link speeds
+
+Routing table
+
+DNS configuration
+
+Hardware information
+
+## 2.6 Advanced setup
+
+Twenty-One Encoder can be fine tuned from the Advanced Setup page found under Setup.
+
+Advanced settings allow you to adjust other Twenty-one encoder parameters such as debug logging, low level performance and quality tuning, the behavior of NVENC, etc.
+
+It’s advised to consult configuration adjustments in the advanced settings .ini files with Comprimato Support or your reseller.
+
+**Advanced setup presets**
+
+Twenty-One Encoder Appliance has four advanced settings presets available:
+
+Default - Slower muxing speed, B-frame encoding, adds 2000ms to latency
+
+Low Latency - Faster muxing speed, enables low latency configuration, disables B frame encoding.
+
+High Latency, High Quality, Low Bitrate - Slowest muxing speed, highest quality
+
+Development Default - For internal development team, do not use unless instructed
+
+Near to Available settings is a drop-down menu as you can see in Figure 10 – you can select any preset.
+
+Note: New presets will appear in the drop-down menu, if you upload a new one.
+
+*Figure: AVAILABLE SETTINGS*
+
+#### How to adjust and upload settings.ini
+
+**Log in to the Twenty-One Encoder user interface**.
+
+**Mouse over "Setup" in the upper right corner.**
+
+**From the drop-down menu, click on "Advanced Setup".**
+
+**Use the "Download" button to download the selected settings.ini file.**
+
+**settings.ini can be edited in any text editor.**
+
+**Overwrite the value for the required items.**
+
+**Save and close the settings.ini file.**
+
+**Upload the settings.ini file to Twenty-One Encoder using the "Upload" button.**
+
+**Apply the uploaded settings.ini using the "Apply" button.**
+
+**You will be asked for a re**start**, make it so.**
+
+*Figure: ADVANCED SETTINGS MANAGEMENT*
+
+## 2.7 Version management
+
+You can access Version management by clicking the Version management option under the Setup mouseover. You can select from uploaded upgrade files, which you need to obtain from your supplier first. Select the version you are interested in and click the Perform upgrade button. After that, you will be asked whether you want to restart the server right away or do it later.
+
+*Figure: UPGRADING & DOWNGRADING*
+
+You are also able to change the version to an older release from the drop-down menu.
+
+## 2.8 Version change during server boot-up
+
+If you want to perform a one-time change, you can choose which version you want to boot during the server boot-up sequence from the GRUB menu (accessed on Display Port 1). After another reboot, it will go back to the version you upgraded to last time.
+
+*Figure: BOOT-UP SCREEN*
+
+## 2.9 Reinstallation from the UI
+
+If your server behaves strangely, underperforms, or has a broken configuration, you can reinstall it. The reinstallation feature makes a clean installation of the currently booted version. It keeps only licenses; everything else turns back to default **(including passwords)**.
+
+You can start the Reinstallation by clicking the Perform reinstallation button on the Version Management page.
+
+*Figure: REINSTALLATION BUTTON*
+
+Once changes are applied, you are presented with the result and the server reboots itself. The following boot may take longer, and the server may reboot itself several times to finish the process. When the Reinstallation is completed, the machine will boot up normally, allowing the user to login into the UI.
+
+## 2.10 Reinstallation from the bootloader menu
+
+**If your server can’t boot successfully, or you forgot the UI password, you can perform a Reinstallation from the bootloader menu during boot-up. Select the “> REINSTALL LATEST” item with arrows and press Enter on your keyboard.**
+
+*Figure: BOOTLOADER SCREEN WITH THE “> REINSTALL LATEST” ITEM*
+
+Then the server boots into a text environment where it asks for confirmation of the reinstallation process to not start it by mistake.
+
+*Figure: REINSTALLATION CONFIRMATION*
+
+After the Reinstallation finishes, you are presented with its result, and the server reboots itself. The following boot may take longer, and the server may reboot itself several times to finish the process. Once the Reinstallation is completed, the machine will boot up normally, allowing the user to log into the UI.
+
+## 2.11 Diagnostics
+
+If you encounter any issues with Twenty-one encoder, you may generate a diagnostic report by selecting the Diagnostics option under Setup Mouseover. The diagnostic report contains the following:
+
+**Information about the system**
+
+**Configuration of video pipelines**
+
+**System logs**
+
+Once you download the file, please send it to the support team.
+
+*Figure: DOWNLOAD DIAGNOSTIC REPORT*
+
+When opening a support case with Comprimato support team or your reseller, please include the following details if deemed necessary:
+
+**Date/time of issue, please include your time zone**
+
+**Which pipeline name or ID**
+
+**Screengrabs of UI**
+
+**Input and/or output capture **
+
+**Diagnostics package**
+
+**In-depth description of the issue encountered**
+
+## 2.12 Security
+
+To access this configuration page, you have to click on the Security button after hovering your mouse cursor over the User icon in the upper right corner.
+
+There you can disable or enable SSH access to the device altogether by clicking the Disable button underneath the Secure Shell (SSH) heading.
+
+*Figure: SECURE SHELL ACCESS*
+
+Additionally, you can manage passwords for the web application user and the console user by filling in the current password and setting the new password.
+
+*Figure: PASSWORD CONFIGURATION*

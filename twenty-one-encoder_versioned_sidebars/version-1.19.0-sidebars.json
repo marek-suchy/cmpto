@@ -1,0 +1,69 @@
+{
+  "twentyOneEncoderSidebar": [
+    {
+      "type": "doc",
+      "id": "index",
+      "label": "Overview"
+    },
+    {
+      "type": "doc",
+      "id": "introduction",
+      "label": "Introduction"
+    },
+    {
+      "type": "doc",
+      "id": "operation",
+      "label": "Operation"
+    },
+    {
+      "type": "doc",
+      "id": "pipeline-configuration",
+      "label": "Pipeline Configuration"
+    },
+    {
+      "type": "doc",
+      "id": "srt",
+      "label": "SRT"
+    },
+    {
+      "type": "doc",
+      "id": "rtmp",
+      "label": "RTMP"
+    },
+    {
+      "type": "doc",
+      "id": "hls",
+      "label": "HLS"
+    },
+    {
+      "type": "doc",
+      "id": "ndi",
+      "label": "NDI"
+    },
+    {
+      "type": "doc",
+      "id": "timestamp-sei",
+      "label": "Timestamp SEI"
+    },
+    {
+      "type": "doc",
+      "id": "st2110",
+      "label": "ST 2110"
+    },
+    {
+      "type": "doc",
+      "id": "system-administration",
+      "label": "System Administration"
+    },
+    {
+      "type": "doc",
+      "id": "troubleshooting",
+      "label": "Troubleshooting"
+    },
+    {
+      "type": "doc",
+      "id": "density",
+      "label": "Approximate Density"
+    }
+  ]
+}

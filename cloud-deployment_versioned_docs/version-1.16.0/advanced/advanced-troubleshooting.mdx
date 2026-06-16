@@ -1,0 +1,62 @@
+---
+title: Advanced Troubleshooting
+sidebar_position: 3
+---
+
+This page covers advanced diagnostics for Live Transcoder operators dealing with licensing, hardware resource monitoring, and escalated support.
+
+## Licensing Issues
+
+Live Transcoder requires public internet connectivity to reach the Comprimato license servers:
+
+- `https://ls.transcoder.comprimato.com`
+- `https://ls2.transcoder.comprimato.com`
+
+### Verify Connectivity
+
+Use a reverse DNS lookup to confirm your host can reach the license servers:
+
+```bash
+nslookup ls.transcoder.comprimato.com
+nslookup ls2.transcoder.comprimato.com
+```
+
+Check active connections using netstat:
+
+```bash
+sudo netstat -tnp | grep ls.transcoder
+```
+
+### License Feature Mismatch
+
+If the web UI displays a warning that pipeline features don't match your license, the selected pipeline type may require a higher license tier. Contact [Comprimato Support](./contact-details) to review your license feature set.
+
+## Hardware Resource Monitoring
+
+The Live Transcoder hardware utilization dashboard (accessible via the **"Live Transcoder"** link in the top-left corner) displays the following metrics:
+
+| Metric | Notes |
+|---|---|
+| System RAM | Scalable graph; shows overall memory consumption |
+| GPU Memory | Separate from system RAM; shown against total GPU VRAM |
+| CPU Utilization | Recommendation: keep below **75%** during active pipelines |
+| GPU Utilization | Can safely show >100% (NVENC and NVDEC are tracked independently); sustained 100% with low CPU indicates a GPU upgrade is needed |
+| Network Bandwidth | Graph scales to peak traffic |
+| Ancillary Services | Status of REST API, SNMP agent, SSH daemon, license server connection, and monitoring service |
+
+:::note
+GPU utilization percentages shown in the dashboard do not represent true GPU capacity at 100%. NVENC and NVDEC are reported separately, so combined figures can exceed 100%.
+:::
+
+## Support Request Requirements
+
+When escalating to Comprimato Support, provide:
+
+- Exact date/time of the issue (with time zone)
+- Customer identification
+- Product name and version
+- Detailed description of the incident, including affected host and pipeline ID
+- Diagnostics package (upload to [www.download.comprimato.com](https://www.download.comprimato.com) — contact support for credentials)
+- UI screenshots or error messages
+
+See [Raising Support Requests](../troubleshooting/support-requests) for the full checklist.

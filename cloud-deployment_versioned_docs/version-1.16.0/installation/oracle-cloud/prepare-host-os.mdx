@@ -1,0 +1,124 @@
+---
+title: Prepare Host OS
+sidebar_position: 2
+---
+
+This guide covers the required OS configuration steps for an Oracle Cloud instance before running Live Transcoder.
+
+## 1. Connect via SSH
+
+The default user on OCI Ubuntu instances is `opc`. Set permissions on your private key and connect:
+
+```bash
+chmod 400 your-key.pem
+ssh -i your-key.pem opc@<your-public-ip>
+```
+
+## 2. Disable the OS Firewall
+
+Oracle Cloud instances are protected by Network Security Groups at the cloud level, so the in-OS firewall is redundant and can be disabled:
+
+```bash
+sudo systemctl stop firewalld
+sudo systemctl disable firewalld
+```
+
+## 3. Install Nvidia GPU Drivers
+
+First, disable the `nouveau` open-source driver to prevent conflicts:
+
+```bash
+echo "blacklist nouveau" | sudo tee /etc/modprobe.d/blacklist-nouveau.conf
+echo "options nouveau modeset=0" | sudo tee -a /etc/modprobe.d/blacklist-nouveau.conf
+sudo update-initramfs -u
+sudo reboot
+```
+
+After reboot, reconnect and install the Nvidia proprietary driver (version 515-dkms):
+
+```bash
+sudo apt install -y nvidia-driver-515-dkms
+sudo reboot
+```
+
+After the second reboot, verify the driver is working:
+
+```bash
+nvidia-smi
+```
+
+## 4. Install Docker CE
+
+```bash
+curl -fsSL https://get.docker.com | sudo sh
+sudo usermod -aG docker $USER
+newgrp docker
+```
+
+## 5. Install NVIDIA Container Toolkit
+
+```bash
+distribution=$(. /etc/os-release; echo $ID$VERSION_ID)
+curl -s -L https://nvidia.github.io/nvidia-docker/gpgkey | sudo apt-key add -
+curl -s -L https://nvidia.github.io/nvidia-docker/$distribution/nvidia-docker.list | \
+  sudo tee /etc/apt/sources.list.d/nvidia-docker.list
+sudo apt update
+sudo apt install -y nvidia-container-toolkit=1.17.7-1
+sudo systemctl restart docker
+```
+
+## 6. Install Docker Compose
+
+```bash
+sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" \
+  -o /usr/local/bin/docker-compose
+sudo chmod +x /usr/local/bin/docker-compose
+```
+
+## 7. Increase UDP Kernel Buffer Sizes
+
+For streams exceeding 21 Mbps, increase UDP buffer limits:
+
+```bash
+sudo sysctl -w net.core.rmem_max=262144000
+sudo sysctl -w net.core.wmem_max=262144000
+```
+
+Persist across reboots by adding to `/etc/sysctl.conf`:
+
+```
+net.core.rmem_max=262144000
+net.core.wmem_max=262144000
+```
+
+## 8. Increase txqueuelen (High-Bitrate Codecs)
+
+For JPEG2000 or JPEG-XS streaming, increase the transmit queue length:
+
+```bash
+sudo ip link set eth0 txqueuelen 10000
+```
+
+To persist this setting, create a udev rule:
+
+```bash
+sudo nano /etc/udev/rules.d/99-txqueuelen.rules
+```
+
+Add:
+
+```
+ACTION=="add", SUBSYSTEM=="net", KERNEL=="eth*", RUN+="/sbin/ip link set %k txqueuelen 10000"
+```
+
+## 9. Remove avahi-daemon (mDNS)
+
+The `avahi-daemon` service interferes with NDI discovery. Remove it:
+
+```bash
+sudo apt remove --purge avahi-daemon -y
+```
+
+## Next Step
+
+Proceed to [Run Docker Container](../../run/run-docker-container) to deploy Live Transcoder.

@@ -1,0 +1,16 @@
+---
+title: Pipeline creation failed
+hide_title: false
+---
+
+![](/img/cloud-deployment/Screenshot_2024-01-15_at_16.18.37.png)
+
+This may be caused by one of the following:
+
+## a) There is no Nvidia GPU in the Live Transcoder system.
+
+Please use a machine that has an Nvidia GPU. You can find more information in the **INSTALLATION** section (e.g. [Launch host instance](../installation/aws/launch-host-instance) for AWS).
+
+## b) The Nvidia driver is too old and Live Transcoder is unable to use the GPU.
+
+Please update the Nvidia driver to the latest version or reinstall your host OS from an up-to-date AMI.

@@ -1,0 +1,34 @@
+---
+title: HLS
+sidebar_label: HLS
+---
+
+# 6.0 HLS
+
+HTTP Live Streaming is an adaptive bitrate streaming protocol. It is one of the most popular streaming formats.
+
+As of now, we support only HLS on the input, with a few limitations:
+
+users are unable to select a particular time in the VOD HLS stream, it starts processing VOD from the start, unless it’s also live. Then Live Transcoder processes the newest part of the stream to follow with the live transmission,
+
+users are unable to select a particular stream from the HLS ladder if more are present. Live Transcoder automatically chooses the one with the highest quality for conversion,
+
+supported video codecs within HLS are H.264 and H.265, whereas, for audio, it is EAC3, AC3 and AAC
+
+Live Transcoder does not verify certificate validity when using an HTTPS stream.
+
+## 6.1 Configuring HLS input
+
+To set up an HLS input stream, the first thing you need to do is to navigate to the Input stream source and set the type as HLS and just beneath it, fill out the URL address (example of a stream URL: http://source.example/file.m3u8). If you have provided a valid URL, Live Transcoder will ingest the input stream and autodetect contents which you then can confirm and later set an output stream.
+
+You also must configure the Buffer size. We recommend using a value 7 to 10 times higher than the length of the HLS segment. At start, you will have to wait the set amount for the video to buffer before you can see any output. Make sure that the buffer is not too short (e. g. single-digit duration of it), since it may cause buffering due to an unstable network.
+
+*Figure: HLS CONFIGURATION*
+
+If you want to use a hostname instead of an IP address in the URL, you need to set an appropriate DNS server and if it’s in the external network, the set Default route needs to have access to the Internet (both can be done in the Setup, more about that in the section 2.1)
+
+## 6.2 Configuring HLS output
+
+If you set HLS on output, Live Transcoder will start behaving like a server and you can connect to that server. UI automatically shows all URL addresses where you can find the stream.
+
+*Figure: HLS CONFIGURATION*

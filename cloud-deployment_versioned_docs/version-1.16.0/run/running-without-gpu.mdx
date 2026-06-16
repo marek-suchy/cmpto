@@ -1,0 +1,52 @@
+---
+title: Running Without GPU
+sidebar_position: 2
+---
+
+Live Transcoder can operate on instances without an Nvidia GPU, provided you limit your pipelines to CPU-compatible workflows.
+
+## Supported CPU-Only Use Cases
+
+The following pipeline types work without GPU acceleration:
+
+1. **Video passthrough** — Processes MPEG-TS streams via UDP, RTP, or SRT protocols. Supported codecs for both input and output: H.262, H.264, H.265, JPEG2000, JPEG-XS.
+
+2. **Framerate conversion** — Converts frame rates for MPEG-TS UDP/RTP/SRT sources using H.262, H.264, or JPEG-XS formats.
+
+:::warning
+Not all pipeline types are available in CPU-only mode. GPU-accelerated features (such as scan conversion and NDI input/output) are not supported without a GPU.
+:::
+
+## Configuration
+
+To disable the GPU requirement, edit your `docker-compose.yml` file and remove or comment out:
+
+1. The GPU device reservation block:
+
+```yaml
+# Remove or comment out:
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+```
+
+2. The `NVIDIA_VISIBLE_DEVICES` environment variable:
+
+```yaml
+# Remove or comment out:
+      - NVIDIA_VISIBLE_DEVICES=all
+```
+
+Save the file and recreate the container:
+
+```bash
+docker-compose up -d --force-recreate
+```
+
+## Recommended AWS Instance for CPU-Only Deployments
+
+AWS recommends the **c5a.16xlarge** instance type for CPU-only Live Transcoder deployments.

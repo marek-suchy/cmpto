@@ -1,0 +1,60 @@
+---
+title: SRT protocol for reliable data transmission
+sidebar_label: SRT protocol for reliable data transmission
+---
+
+# 4.0 SRT protocol for reliable data transmission
+
+SRT is a video transport protocol that is intended to be used over unreliable networks such as the public Internet. It amends the packet loss, jitter and fluctuating bandwidth to maintain the high quality of transported video stream. It has end-to-end security mechanisms to protect the transmitted data as well as it is easy to configure to work with network firewalls. If you wish to learn more about the protocol, please visit the official website.
+
+Comprimato Live Transcoder has support for 2 SRT modes of operation – **Listener, Caller**. In other words, this is simply the client–server model. The **Listener unit is configured to connect to its own local IP address that will be receiving data** from the (external) Caller unit. Therefore, the **Caller machine is configured with the IP address of an external (to it) unit where the data will be listened to.**
+
+**Note: **SRT is a connection-oriented communication and therefore cannot use multicast IP delivery.
+
+**Note: **Multiple callers are not accepted unless part of the same socket group, see 4.4 SRT bonding for more details
+
+## 4.1 Configuring SRT Input
+
+When you wish to configure SRT for use, you need to select the Input Stream Type item called SRT -> MPEG-TS over SRT, as you can see in Figure 45. **Before configuring the IP address and IP port, it is advised to select whether you intend to use Caller/Listener mode.** This has a direct impact on what IP you need to provide.
+
+When you select SRT mode:
+
+*Figure: CONFIGURING SRT INPUT SOURCE*
+
+Listener – Specify the port of the local machine where an external Caller unit will request a connection to start sending data there. If "Any" interface is selected, the SRT connection on the selected port is accepted on all interfaces, thus automatically supporting redundant sources - SRT bonding (for details, see section 4.4). Upon selecting a specific interface, a local IP which is listened on, may be also specified.
+
+Caller – IP:port of the remote machine from where the data will be sent
+
+**It is necessary to define the ****SRT latency**** variable in milliseconds (ms).** The parameter is the time of intended delay of network packets (a buffer) that is allowed for the connection to slow down the data in transmission in order to provide a time slot to re-send lost UDP packets if they occur. This is what allows the SRT protocol to establish a reliable connection with a focus on removing video disruptions.
+
+Live Transcoder also supports the option to enable SRT Encryption. The encryption has to be configured on both ends – caller and listener and uses the same passphrase on both ends (symmetric cryptography). The passphrase needs to have between 10 and 79 characters. Clicking on the icon next to the passphrase you can reveal it.
+
+## 4.2 Configuring SRT Output
+
+When creating the pipeline’s output side, you can choose to send the traffic via SRT to make the connection more reliable and prevent image loss during transmission. **In the ****Output stream sink**** section, you can select ****Type – SRT**** which will add the SRT configuration options, see Figure** **46. Similarly, as for Input configuration you can choose between 2 modes – Caller, Listener.**
+
+*Figure: CONFIGURING SRT OUTPUT*
+
+When you select SRT mode:
+
+Listener – Specify the port of the local machine where an external Caller unit will request a connection so the output which is being configured can start sending data. If "Any" interface is selected, the SRT connection on the selected port is accepted on all interfaces, thus automatically supporting redundant sources - SRT bonding (for details, see section 4.4). Upon selecting a specific interface, a local IP which is listened on, may be also specified.
+
+Caller – IP:port of the remote machine where the external unit is waiting to receive data
+
+In addition, **you should define the ****SRT overhead**** parameter - an amount of % over the Total Bitrate that can be surpassed in order to achieve the lost data recovery.** As a result, the maximum used connection bitrate equals to configured Total Bitrate + SRT overhead. In general, this is the upper limit and connection does not require it for normal operation.
+
+Similarly, to the input configuration, the SRT encryption is supported on the output, too. In output, you have to select which cipher would be used. The available options are AES-128, AES-192, and AES-256. We recommend using AES-256 encryption whenever possible and a strong passphrase where you can use any printable character.
+
+## 4.3 Stream ID
+
+It’s optional information that you can configure in the SRT Caller mode of operation. The string is sent to the Listener before connecting. If you leave the field empty, the functionality is disabled. The accepted input has up to 512 printable characters.
+
+## 4.4 SRT bonding (redundancy)
+
+SRT bonding enhances reliability by routing traffic across multiple IP paths simultaneously, using socket groups to manage the redundant connections. A typical setup connects the Live Transcoder to two networks from different providers.
+
+**Listener**: Set the network interface to "**Any**". All member paths must use the same UDP port on both the Listener and Caller.
+
+**Caller**: Select a different interface/IP for each redundant path to form a socket group, ensuring the same UDP port is used across all paths.
+
+**Note**: Only Broadcast mode is supported (ensures 100% seamless protection). Main/Backup mode is not supported.

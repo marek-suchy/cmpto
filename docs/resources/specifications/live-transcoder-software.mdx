@@ -1,0 +1,115 @@
+---
+title: Live Transcoder Software — Specifications
+sidebar_label: Live Transcoder Software
+hide_title: true
+---
+
+# Live Transcoder Software
+
+<p className="resource-spec__meta">Software-based live video transcoder for IP broadcast workflows</p>
+
+## Video Input
+
+### Supported Codecs
+
+- JPEG 2000 TR-01 (optional)
+- JPEG-XS TR-07 (optional)
+- NDI (including NDI-HX)
+- H.264 (MPEG-4 AVC)
+- H.265 (HEVC)
+- MPEG-2
+- SMPTE 2110
+
+### Color Component Sampling
+
+- 4:2:2 10-bit / 8-bit
+- 4:2:0 10-bit / 8-bit
+
+## Audio Input
+
+| Codec | Notes |
+|---|---|
+| Uncompressed PCM – multichannel | SMPTE 302M-2007 |
+| AAC | ADTS / LATM |
+| AAC-HE | — |
+| MPEG-2 Audio | — |
+| Dolby-E | pass-through |
+| AC-3 | — |
+| E-AC-3 | — |
+
+## Metadata
+
+- SCTE-35
+- Metadata pass-through
+- Subtitles embedding into H.264 SEI messages
+- Closed Captions (EIA-608/708)
+- SMPTE 2038
+- Timecode insertion into SEI messages for H.264 and H.265 (MISB 0604.6)
+
+## Containers & Protocols
+
+| Protocol / Container | Notes |
+|---|---|
+| UDP, RTP | — |
+| MPEG-2 TS, MPTS | — |
+| VSF TR-01 | optional |
+| VSF TR-07 | optional |
+| RTMP / RTMPS | — |
+| SRT | with Path Redundancy |
+| NDI | — |
+| HLS | — |
+| Hitless Merge | — |
+| Hitless Switch | — |
+
+## Video Processing
+
+- Resizing
+- Automatic color component subsampling
+- De-interlacing
+- Cropping / Padding
+- Color adjustments
+- Frame rate conversion (motion compensated)
+- Logo insertion
+
+## Audio Processing
+
+- Channel shuffling
+- Volume gain
+- Sampling rate conversion
+
+## Video Output
+
+### Codecs
+
+- H.264 (MPEG-4 AVC)
+- NDI
+- JPEG 2000 TR-01 (optional)
+- JPEG-XS TR-07 (optional)
+- H.265 (HEVC)
+- MPEG-2
+- SMPTE 2110
+
+### Color Component Sampling
+
+- 4:2:2 10-bit / 8-bit
+- 4:2:0 10-bit / 8-bit
+
+## Audio Output
+
+| Codec | Notes |
+|---|---|
+| AAC | ADTS / LATM |
+| AAC-HE | — |
+| AC-3 | — |
+| Uncompressed PCM | SMPTE 302M-2007 |
+| MPEG-2 Audio | — |
+| Dolby-E | pass-through |
+
+## Configuration & Monitoring
+
+| Method | Details |
+|---|---|
+| Web UI | — |
+| REST API | — |
+| SNMP | Custom OIDs supported |
+| System webconsole | — |

@@ -1,0 +1,123 @@
+{
+  "cloudDeploymentSidebar": [
+    {
+      "type": "doc",
+      "id": "changelog",
+      "label": "Changelog"
+    },
+    {
+      "type": "doc",
+      "id": "index",
+      "label": "Overview"
+    },
+    {
+      "type": "doc",
+      "id": "prerequisites/get-subscription",
+      "label": "Get Subscription"
+    },
+    {
+      "type": "category",
+      "label": "Installation",
+      "collapsed": false,
+      "items": [
+        {
+          "type": "category",
+          "label": "AWS",
+          "items": [
+            "installation/aws/launch-host-instance",
+            "installation/aws/prepare-host-os"
+          ]
+        },
+        {
+          "type": "category",
+          "label": "Google Cloud",
+          "items": [
+            "installation/google-cloud/prerequisites",
+            "installation/google-cloud/launch-host-instance",
+            "installation/google-cloud/prepare-host-os"
+          ]
+        },
+        {
+          "type": "category",
+          "label": "Oracle Cloud",
+          "items": [
+            "installation/oracle-cloud/launch-host-instance",
+            "installation/oracle-cloud/prepare-host-os"
+          ]
+        },
+        {
+          "type": "category",
+          "label": "On-premises",
+          "items": [
+            "installation/on-prem/hw-requirements",
+            "installation/on-prem/prepare-ubuntu",
+            "installation/on-prem/prepare-other-os"
+          ]
+        },
+        {
+          "type": "category",
+          "label": "Azure",
+          "items": [
+            "installation/azure/launch-host-instance",
+            "installation/azure/prepare-host-os"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "category",
+      "label": "Run",
+      "collapsed": false,
+      "items": [
+        "run/run-docker-container",
+        "run/running-without-gpu",
+        "run/gpu-codec-troubleshooting"
+      ]
+    },
+    {
+      "type": "category",
+      "label": "Usage",
+      "collapsed": false,
+      "items": [
+        "usage/get-started",
+        "usage/api-reference",
+        "usage/how-to-upgrade",
+        "usage/how-to-downgrade"
+      ]
+    },
+    {
+      "type": "category",
+      "label": "Troubleshooting",
+      "items": [
+        "troubleshooting/web-ui-access",
+        "troubleshooting/ndi-sources",
+        "troubleshooting/hls-output",
+        "troubleshooting/licensing",
+        "troubleshooting/pipeline-creation",
+        "troubleshooting/frame-dropping",
+        "troubleshooting/support-requests",
+        "troubleshooting/video-specification",
+        "troubleshooting/gpu-visibility-docker"
+      ]
+    },
+    {
+      "type": "category",
+      "label": "FAQ",
+      "items": [
+        "faq/hls-storage-calculation"
+      ]
+    },
+    {
+      "type": "category",
+      "label": "Advanced",
+      "items": [
+        "advanced/support-guide",
+        "advanced/contact-details",
+        "advanced/advanced-troubleshooting",
+        "advanced/diagnostics",
+        "advanced/cpu-gpu-processing-table",
+        "advanced/performance-testing"
+      ]
+    }
+  ]
+}

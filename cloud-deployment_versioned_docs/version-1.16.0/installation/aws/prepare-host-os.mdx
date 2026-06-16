@@ -1,0 +1,109 @@
+---
+title: Prepare Host OS
+sidebar_position: 2
+---
+
+This guide covers the essential OS configuration steps for an AWS EC2 instance before running Live Transcoder.
+
+## 1. Connect via SSH
+
+Connect to your EC2 instance using SSH with your private key and the default `ubuntu` user:
+
+```bash
+chmod 400 your-key.pem
+ssh -i your-key.pem ubuntu@<your-public-ip>
+```
+
+## 2. Update the System
+
+```bash
+sudo apt update && sudo apt upgrade -y
+```
+
+## 3. Install Docker Compose
+
+```bash
+sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" \
+  -o /usr/local/bin/docker-compose
+sudo chmod +x /usr/local/bin/docker-compose
+```
+
+## 4. Configure Docker cgroup Mode
+
+Create or edit `/etc/docker/daemon.json` to set the cgroup namespace mode:
+
+```bash
+sudo nano /etc/docker/daemon.json
+```
+
+Add the following content:
+
+```json
+{
+  "default-cgroupns-mode": "host"
+}
+```
+
+Restart Docker to apply the change:
+
+```bash
+sudo systemctl restart docker
+```
+
+## 5. Remove avahi-daemon (mDNS)
+
+The `avahi-daemon` mDNS service interferes with NDI source discovery. Remove it:
+
+```bash
+sudo apt remove --purge avahi-daemon -y
+```
+
+## 6. Increase UDP Kernel Buffer Sizes
+
+For streams exceeding 21 Mbps, increase the UDP receive and send buffer limits:
+
+```bash
+sudo sysctl -w net.core.rmem_max=262144000
+sudo sysctl -w net.core.wmem_max=262144000
+```
+
+To make these persistent across reboots, add the following to `/etc/sysctl.conf`:
+
+```
+net.core.rmem_max=262144000
+net.core.wmem_max=262144000
+```
+
+## 7. Increase txqueuelen (High-Bitrate Codecs)
+
+When streaming high-bitrate codecs such as JPEG2000 or JPEG-XS, increase the transmit queue length on network interfaces. Create a udev rule:
+
+```bash
+sudo nano /etc/udev/rules.d/99-txqueuelen.rules
+```
+
+Add:
+
+```
+ACTION=="add", SUBSYSTEM=="net", KERNEL=="eth*", RUN+="/sbin/ip link set %k txqueuelen 10000"
+```
+
+Apply immediately:
+
+```bash
+sudo ip link set eth0 txqueuelen 10000
+```
+
+## 8. Nvidia Container Toolkit — Version Note
+
+:::warning
+There is a known compatibility issue with Nvidia Container Toolkit versions **1.17.8–1.18.0** that prevents proper GPU passthrough to containers. Downgrade to version **1.17.7-1** if you experience GPU-related errors.
+:::
+
+```bash
+sudo apt-get install -y nvidia-container-toolkit=1.17.7-1
+```
+
+## Next Step
+
+Proceed to [Run Docker Container](../../run/run-docker-container) to deploy Live Transcoder.

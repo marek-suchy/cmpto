@@ -1,0 +1,143 @@
+---
+title: Twenty-One Encoder — Specifications
+sidebar_label: Twenty-One Encoder
+hide_title: true
+---
+
+# Twenty-One Encoder
+
+<p className="resource-spec__meta">Software-based ST 2110 encoder and decoder appliance for live broadcast production</p>
+
+## Hardware Specifications
+
+| Parameter | Value |
+|---|---|
+| Form factor | 1U Rackmount |
+| Network connectivity | 2× 10GbE RJ45; 2× 10/25GbE SFP28 |
+| Management | IPMI 2.0 with virtual media over LAN and KVM-over-LAN |
+| Power supply | 100–240 VAC, 50/60 Hz, redundant — 320 W typical |
+| Dimensions (W × H × D) | 17.2" × 1.7" × 18.8" (437 mm × 43 mm × 477 mm) |
+| Package (W × H × D) | 27" × 8" × 24" (686 mm × 203 mm × 610 mm) |
+| Net weight | 16 lbs (7.3 kg) |
+| Gross weight | 25.8 lbs (11.7 kg) |
+| Operating temperature | 10°C to 35°C (50°F to 95°F) |
+| Non-operating temperature | −40°C to 70°C (−40°F to 158°F) |
+| Operating humidity | 8% to 90% (non-condensing) |
+| Non-operating humidity | 5% to 95% (non-condensing) |
+
+## Software Specifications
+
+### Input Protocols & Containers
+
+| Protocol / Container | Notes |
+|---|---|
+| SMPTE 2110 over RTP/UDP | — |
+| VSF TR-01 | optional |
+| VSF TR-07 | optional |
+| MPEG-TS over RTP/UDP | — |
+| SRT | Listener/caller, Path Redundancy, AES-128/256/512 |
+| NDI (including NDI-HX) | Configurable discovery servers |
+| RTMP | — |
+| HLS | Input (live and VOD streams) |
+| 2022-7 | Seamless protection switching |
+
+### Input Video Codecs
+
+- H.264 (AVC)
+- H.265 (HEVC)
+- H.262 (MPEG-2)
+- JPEG-XS (VSF TR-07) — optional
+- JPEG 2000 (VSF TR-01) — optional
+- NDI
+
+### Input Audio Codecs
+
+| Codec | Notes |
+|---|---|
+| AAC | ADTS or LATM |
+| AAC-HE | ADTS or LATM |
+| AAC-HEv2 | ADTS or LATM |
+| AC-3 | ingest |
+| E-AC-3 | ingest |
+| Dolby-E | pass-through |
+| MPEG-2 Audio | ingest |
+| Uncompressed PCM | SMPTE 302M-2007 |
+
+### Output Protocols & Containers
+
+| Protocol / Container | Notes |
+|---|---|
+| SMPTE 2110 | PTP (IEEE 1588-2008), 2022-7 |
+| MPEG-TS over RTP/UDP | Multicast IGMPv3, SSM |
+| VSF TR-01 | — |
+| VSF TR-07 | — |
+| SRT | Listener/caller, broadcast redundancy, encrypted input |
+| NDI | Ultra High Bitrate, Framesync/Freerun, multiple discovery servers |
+| RTMP / RTMPS | — |
+| HLS | HTTP/HTTPS, ABR ladder, configurable buffer/segment size |
+
+### Output Video Codecs
+
+- H.264 (AVC)
+- H.265 (HEVC)
+- H.262 (MPEG-2)
+- JPEG-XS (VSF TR-07) — optional
+- JPEG 2000 (VSF TR-01) — optional
+- NDI
+
+### Output Audio Codecs
+
+| Codec | Notes |
+|---|---|
+| AAC-LATM | — |
+| AAC-ADTS | — |
+| AC-3 | — |
+
+### Video Processing
+
+| Capability | Details |
+|---|---|
+| Resizing, Cropping, Padding | — |
+| De-interlacing / Interlacing | — |
+| Frame rate conversion | Down to half of input frame rate |
+| Color adjustments | — |
+| Auto color component subsampling | 4:2:2 or 4:2:0, 10-bit or 8-bit |
+| Logo insertion | — |
+| Maximum resolution | 4K UHD progressive or interlaced |
+
+### Audio Processing
+
+- Channel shuffling and mixing
+- Volume gain
+- Sampling rate conversion
+
+### Metadata
+
+- SCTE-35
+- Metadata pass-through
+- Subtitles embedding into H.264 SEI messages
+- Closed Captions (EIA-608/708)
+- SMPTE 2038
+- H.264 / H.265 SEI timestamp messaging
+- Timecode generation into SEI messages
+
+### Other Capabilities
+
+| Capability | Details |
+|---|---|
+| Multi-channel synchronous transport | Combining multiple inputs into a single output |
+| Multiple outputs | Different formats from a single input |
+| ABR transcoding | HLS ladder output |
+| Auto reconfiguration | According to live input changes |
+| CBR / VBR / Capped VBR | — |
+| PCR locking | Locking to external PCR in a separate TS with PTS re-timestamping |
+| NMOS | IS-04, IS-05 |
+
+### Configuration & Monitoring
+
+| Method | Details |
+|---|---|
+| Web UI | — |
+| REST API | — |
+| SNMP | — |
+| SSH | — |

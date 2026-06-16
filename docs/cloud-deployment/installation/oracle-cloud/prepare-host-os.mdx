@@ -1,0 +1,157 @@
+---
+title: Prepare host OS
+hide_title: false
+---
+
+# SSH to the host OS
+
+You can find the instance's public IP address in the list of your instances.
+
+![](/img/cloud-deployment/oci-instances.png)
+
+Oracle Linux's default user is `opc`, use the following command to ssh to your instance (to the host OS). On Linux and macOS, you'll first need to limit the key file permissions using the `chmod` command.
+
+```shell
+chmod 400 path/to/your-private-key.pem
+```
+
+```shell
+ssh -i path/to/your-private-key.pem opc@INSTANCE_IP
+```
+
+# Disable firewalld
+
+Oracle cloud instances are protected by the Network Security Groups (the cloud firewall feature), so you can stop and disable the in-OS firewall.
+
+```shell
+sudo systemctl disable firewalld --now
+```
+
+# Update the OS
+
+This takes several minutes.
+
+```shell
+sudo dnf update -y
+```
+
+# Disable nouveau driver
+
+`nouveau`, the open-source driver for Nvidia GPUs is usually pre-loaded. It must be disabled to install Nvidia's own driver.
+
+```shell
+sudo modprobe -r nouveau
+```
+
+Prevent loading of the `nouveau` kernel module at boot.
+
+```shell
+echo "blacklist nouveau" | sudo tee /etc/modprobe.d/blacklist.conf
+```
+
+# Install Nvidia driver
+
+## Prerequisites
+
+```shell
+sudo dnf --enablerepo=ol8_developer_EPEL -y install dkms
+sudo dnf -y config-manager --add-repo http://developer.download.nvidia.com/compute/cuda/repos/rhel8/x86_64/cuda-rhel8.repo
+```
+
+## Install the driver
+
+```shell
+sudo dnf module -y install nvidia-driver:515-dkms
+sudo modprobe nvidia
+```
+
+## Check Nvidia driver works
+
+The following command should print a meaningful output.
+
+```shell
+nvidia-smi
+```
+
+# Install Docker CE
+
+## Installation
+
+Follow the **Setting up Docker on CentOS 7/8** chapter from the official [Nvidia docs](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/install-guide.html#setting-up-docker-on-centos-7-8) (Centos 8 variant)
+
+## Use `docker` command without sudo
+
+This allows running the docker command as a non-root user.
+
+```shell
+sudo groupadd docker
+sudo usermod -aG docker $USER
+newgrp docker
+```
+
+# Install NVIDIA Container Toolkit
+
+Follow the **Setting up NVIDIA Container Toolkit** chapter from the official [Nvidia docs](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/install-guide.html#id2) (Centos 8 variant). You need to use the following command for setting up the Nvidia Container toolkit repository instead of the official one (Oracle Linux 8 isn't supported by their command).
+
+```shell
+curl -s -L https://nvidia.github.io/libnvidia-container/centos8/libnvidia-container.repo | sudo tee /etc/yum.repos.d/nvidia-container-toolkit.repo
+```
+
+# `docker-compose` installation
+
+We use the `docker-compose` tool for making it easier to launch our Docker container. Use the following command to install the `docker-compose` tool.
+
+```shell
+sudo curl -L https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m) -o /usr/local/bin/docker-compose
+sudo chmod +x /usr/local/bin/docker-compose
+```
+
+Next, check that the `docker-compose` tool is successfully installed. The following command should return meaningful output.
+
+```shell
+docker-compose version
+```
+
+# Disable mDNS on the host
+
+The mDNS service mustn't be active in the host OS for NDI discovery to work. If present, this command removes it from the host OS:
+
+```shell
+sudo yum list installed avahi
+sudo yum remove avahi
+```
+
+# Increase max UDP kernel buffer size
+
+To receive and send streams with overall stream bitrate of 21mbps+, Live Transcoder needs to increase the UDP kernel buffer size. However, the default maximum size is too low so it needs to be increased.
+
+```shell
+SYSCTL_CONF="/etc/sysctl.d/10-udp-buffer-size.conf"
+sudo sh -c "echo '#kernel send a receive windows buffer sizes' > $SYSCTL_CONF"
+sudo sh -c "echo 'net.core.rmem_max=262144000' >> $SYSCTL_CONF"
+sudo sh -c "echo 'net.core.wmem_max=262144000' >> $SYSCTL_CONF"
+sudo sh -c "echo 'net.core.rmem_default=262144000' >> $SYSCTL_CONF"
+sudo sh -c "echo 'net.core.wmem_default=262144000' >> $SYSCTL_CONF"
+```
+
+Now load the updated config file.
+
+```shell
+sudo sysctl -p $SYSCTL_CONF
+```
+
+# Increase txqueuelen for network interfaces
+
+To stream out high-bitrate codecs (e.g., JPEG2000 or JPEG-XS), also `txqueuelen` parameter should be increased for the respective network interface(s). Below, we set the parameter for all available Ethernet network interfaces (by using `KERNEL=="e*"`):
+
+```shell
+sudo bash -c 'cat > /etc/udev/rules.d/80-txqueuelen.rules' << EOF
+SUBSYSTEM=="net", ACTION=="add|change", KERNEL=="e*", ATTR{tx_queue_len}="10000"
+EOF
+```
+
+To apply the changes immediately, run:
+
+```shell
+sudo udevadm control --reload-rules && sudo udevadm trigger
+```

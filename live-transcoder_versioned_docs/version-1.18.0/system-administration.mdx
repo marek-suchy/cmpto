@@ -1,0 +1,112 @@
+---
+title: Live Transcoder System and Network Administration
+sidebar_label: Live Transcoder System and Network Administration
+---
+
+# 9.0 Live Transcoder System and Network Administration
+
+## 9.1 Console Administration via KIOSK
+
+The default user environment is the web-based application. **However, for advanced administrative tasks, it is possible to switch to the system console**. Plug a monitor into display port #1 (Right most port on the GPU) to access KIOSK. The background OS is Rocky Linux 9 where the standard shortcut Ctrl+Alt+F1 will forward you to the console environment, or alternatively Ctrl+Alt+T (used in the web application) forwards you to a graphical terminal application (it’s not meant for long-term use, only for a quick configuration or diagnostic).
+
+#### System services:
+
+All Live Transcoder components run as a system service. You can use the standard OS’s interface systemctl to manage those services.
+
+transcoder-basestarts the transcoder and the webserver with web UI at the system start
+
+transcoder-xstarts graphical window system with lightweight desktop manager OpenBox
+
+transcoder-browserstarts Chromium browser in kiosk mode and restarts it in case it detects that Chromium stops running
+
+**transcoder-license**
+
+starts the license server with its web UI at the system start
+
+## 9.2 Web Administration
+
+The security of the system is provided by a built-in firewall. The setup is available in the UI's setup wizard.
+
+Each network interface needs to be marked with an attribute whether its intent is to be used for:
+
+**Administration – SSH, HTTP(S), SNMP and HLS protocols ports allowed**
+
+**Incoming/outgoing streams – 1024-65535 ports allowed**
+
+**Both**
+
+**Unused**
+
+**All the remaining ports are blocked**.
+
+In a situation when an interface is marked either Administration or Unused it will not show in the stream configuration dialogue; therefore, it cannot be selected there.
+
+## 9.3 Manual network interface configuration
+
+Live Transcoder UI offers only a limited possibility to configure network interfaces, and maybe you need to set it more precisely. In Rocky Linux 9, there are two supported ways to configure network interfaces.
+
+**ifcfg files – It uses ifcfg network configuration script files placed in ‘/etc/sysconfig/network-scripts’. It is used internally in **Live Transcoder**. You can manually adjust some parameters when needed.**
+
+**ip command – some changes made by the ip command are only temporal and are not guaranteed to survive system restart. Please do not use it besides testing.**
+
+## 9.4 Configuring Virtual interfaces
+
+Live Transcoder currently does not support creating new virtual interfaces in web UI. These interfaces need to be added using ifcfg scripts. Currently, the Live Transcoder recognizes bond, bridge and vlan interfaces.
+
+For example, to add vlan 100 to existing ethernet interface eno1:
+
+With sudo add a new file ifcfg-eno1.100 to directory sudo /etc/sysconfig/network-scripts/ (for example with nano or vim)
+
+cd /etc/sysconfig/network-scripts/
+
+sudo nano ifcfg-eno1.100
+
+DEVICE=eno1.100
+
+TYPE=Vlan
+
+VLAN=yes
+
+VLAN_ID=100
+
+ONBOOT=yes
+
+BOOTPROTO=none
+
+NM_CONTROLLED=no
+
+IPV6INIT=no
+
+ZONE=trc-admin-data
+
+Next restart network service, this will interrupt all network traffic to & from the encoder:
+
+sudo systemctl restart network.service
+
+Restart transcoder service
+
+sudo systemctl restart transcoder-base
+
+Wait until Live Transcoder starts and in Live Transcoder Dashboard run Setup where you can find your new vlan interface. Configure usage and complete setup.
+
+## 9.5 Using REST API
+
+Comprimato Live Transcoder** is REST API ready**. You can access the complete API documentation from the top right-hand side corner in UI using the API button. Here we list some curl commands:
+
+**list network interfaces **
+
+**curl 'http://localhost:8080/api/system/network-interfaces' -i -H 'Accept: application/json'**
+
+**list all available pipelines**
+
+**curl 'http://localhost:8080/api/pipelines' -i -H 'Accept: application/json'**
+
+**add simple pipeline with input stream data**
+
+```bash
+**curl 'http://localhost:8080/api/pipeline' -i -X POST -H 'Content-Type: application/json' \-d '{ "name" : "Pipeline 3", "source" : "udp://127.0.0.1:5000:lo", "complianceWith" : "TR_01", "video" : {   "format" : "J2K",   "width" : 1920,   "height" : 1080,   "sampling" : "4:2:2",   "depth" : 10,   "framerate" : "24",   "fieldOrder" : "PROGRESSIVE" }}**
+```
+
+**get the state of pipeline with ID 0**
+
+**curl 'http://localhost:8080/api/pipeline/0/state' -i -H 'Accept: application/json'**

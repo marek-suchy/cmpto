@@ -1,0 +1,65 @@
+---
+title: Launch Host Instance
+sidebar_position: 1
+---
+
+This guide explains how to select and launch an AWS EC2 instance suitable for running Live Transcoder.
+
+## Requirements
+
+- An active Live Transcoder subscription
+- An Nvidia GPU instance — **g4dn instances with Nvidia Tesla T4 GPUs** are recommended for optimal cost-performance
+- Sufficient GPU instance quota in your chosen AWS region
+- Proper security group configuration
+
+## Instance Selection
+
+Start with a `g4dn.2xlarge` (8 vCPUs, single T4 GPU).
+
+:::note
+You'll need approximately **two vCPUs per 1080p H.264 4:2:0 8-bit stream**. Requirements are significantly higher for higher quality formats. Monitor CPU utilization and scale up if it exceeds 75%.
+:::
+
+For framerate/standards conversion with motion compensation, larger instances are required:
+
+| Use Case | Recommended Instance |
+|---|---|
+| Basic framerate conversion | `g5.8xlarge` |
+| 4K 50/59.94 fps conversion | `g5.24xlarge` |
+
+## Setup Steps
+
+### 1. Check GPU Quota
+
+Verify your region's **"Running On-Demand G and VT instances"** quota in the AWS Service Quotas console.
+
+### 2. Request a Quota Increase (if needed)
+
+AWS approval is required. Allow several hours or longer for the request to be processed.
+
+### 3. Launch the Instance
+
+Use the **Ubuntu Deep Learning AMI** which includes pre-installed Nvidia drivers.
+
+### 4. Configure Security Groups
+
+Open the following inbound ports:
+
+| Port(s) | Protocol | Purpose |
+|---|---|---|
+| 22 | TCP | SSH |
+| 80, 443 | TCP | HTTP/HTTPS (Web UI, HLS) |
+| 5353–7999 | TCP/UDP | NDI |
+| 1935 | TCP | RTMP input |
+
+### 5. Configure Storage
+
+Allocate a minimum of **100 GiB** `gp3` storage for the OS and Live Transcoder. Add additional capacity if you plan to use HLS outputs.
+
+### 6. Assign an Elastic IP
+
+Assign an Elastic IP address to prevent the public IP from changing on instance reboot or shutdown.
+
+## Next Step
+
+Proceed to [Prepare Host OS](./prepare-host-os) to configure the instance before running Live Transcoder.

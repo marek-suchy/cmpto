@@ -1,0 +1,43 @@
+---
+title: Running Live Transcoder without GPU
+hide_title: false
+---
+
+If your instance doesn't feature Nvidia GPU, you may still run Live Transcoder with pipelines which don't involve GPU processing.
+
+The following use cases can be used without a GPU:
+
+| Use case                                        | Input                                  | Output                                 |
+| :---------------------------------------------- | :------------------------------------- | :------------------------------------- |
+| **Video passthrough**: MPEG-TS UDP, RTP, SRT    | H.262, H.264, H.265, JPEG2000, JPEG-XS | H.262, H.264, H.265, JPEG2000, JPEG-XS |
+| **Framerate conversion**: MPEG-TS UDP, RTP, SRT | H.262, H.264, JPEG-XS                  | H.262, H.264, JPEG-XS                  |
+
+:::note
+Recommended instance type for AWS EC2 c5a.16xlarge
+:::
+
+To enable CPU-only run, the docker-compose.yml must be changed this way:
+
+1. Open docker-compose.yml with a text editor:\
+   `vim docker-compose.yml`
+   or
+   `nano docker-compose.yml`
+2. Delete or comment out (`#`) the following lines:
+
+```yaml
+deploy:
+  resources:
+    reservations:
+      devices:
+        - driver: nvidia
+          count: all
+          capabilities: [gpu]
+```
+
+and:
+
+```yaml
+- NVIDIA_VISIBLE_DEVICES=all
+```
+
+3. Save the file (in the vim editor press `<esc>` key, then `:wg` + `<enter>`; in the nano editor press `<ctrl>` + `X` and confirm by pressing `Y`, then `<enter>`)

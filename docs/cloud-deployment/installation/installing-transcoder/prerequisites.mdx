@@ -1,0 +1,18 @@
+---
+title: Prerequisites
+hide_title: false
+---
+
+### BIOS setup
+
+Before starting an ISO installation, please ensure your BIOS settings are compliant so the installation can be completed successfully.
+
+The guide below was created using SuperMicro MB, however, other brands won't differ significantly.
+
+1. Start by resetting the BIOS to the default state: Save & Exit → Restore Optimized Defaults
+2. Set Security → Secure Boot → Secure Boot to [Disabled]
+3. Set Security → Secure Boot → CSM Support to [Enabled]
+4. Set Boot → Boot mode select to [LEGACY]
+5. Set Boot → LEGACY to EFI support to [Enabled]
+6. Set Advanced → PCIe/PCI/PnP Configuration → NVMe Firmware Source to [AMI Native Support]
+   * this one is important, especially when NVMe SSD disks are on-board

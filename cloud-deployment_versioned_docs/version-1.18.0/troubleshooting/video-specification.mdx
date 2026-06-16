@@ -1,0 +1,30 @@
+---
+title: Input Video Must Be Specified Before Output Stream Can Be Defined
+sidebar_position: 8
+---
+
+## Warning Description
+
+This warning appears in the Live Transcoder interface when the system has detected an incoming video signal but it has not been formally configured as the pipeline's input source.
+
+The system recognizes the video signal's characteristics (resolution, frame rate, codec, etc.) but requires explicit confirmation before processing can begin.
+
+## Resolution
+
+Two approaches are available:
+
+### Option A: Manual Configuration
+
+Click the **"Set as input"** button to apply the detected video source's settings to your pipeline configuration. This immediately sets the detected standard as the input and allows the pipeline to start.
+
+### Option B: Enable Auto Reconfiguration
+
+Enable the **"Auto Reconfiguration"** feature in the pipeline settings. With this enabled, Live Transcoder will automatically update the input configuration whenever the detected video source changes.
+
+This is useful for scenarios where video inputs are expected to vary during operation, such as switching between different camera feeds or signal sources.
+
+## Related Resources
+
+- [Getting Started](../usage/get-started)
+- [API Reference](../usage/api-reference)
+- [GPU Visibility in Docker](./gpu-visibility-docker)

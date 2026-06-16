@@ -1,0 +1,30 @@
+---
+title: How to upgrade
+hide_title: false
+---
+
+First, ssh to the host OS.
+
+# Upgrading the Live Transcoder
+
+If you want to switch to the latest version of Live Transcoder, you must stop the currently running container, pull the newest image and start the container again. Your pipelines and settings will be saved.
+
+```shell
+docker-compose stop
+docker-compose pull
+docker-compose up -d
+```
+
+# Clean user data
+
+User data (pipelines and settings) are saved in a persistent docker volume, so all configurations and presets are kept when upgrading. To reset user settings and pipelines, please delete the docker volume
+
+```shell
+docker volume rm transcoder0-data
+```
+
+or stop running the container with the volume deletion flag enabled
+
+```shell
+docker-compose -f <compose-file.yml> down -v
+```

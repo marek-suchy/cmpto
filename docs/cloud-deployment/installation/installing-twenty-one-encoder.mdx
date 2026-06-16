@@ -1,0 +1,325 @@
+---
+title: Installing Twenty-One Encoder Docker
+hide_title: false
+---
+
+Twenty-One Encoder for ProxMox VE on Ubuntu
+
+**Pre-requisites:**
+
+* Ubuntu 24.04 LTS AMD64
+* Linux Kernel 6.x - 2.6
+* PCI passthrough of Connectx network card
+* PCI passthrough of Nvidia GPU
+
+## 1. Disable nouveau driver
+
+```bash
+sudo modprobe -r nouveau
+```
+
+## 2. Blacklist nouveau at boot
+
+```bash
+echo "blacklist nouveau" | sudo tee /etc/modprobe.d/blacklist.conf
+```
+
+## 3. Upgrade OS
+
+```bash
+sudo apt upgrade -y
+```
+
+## 4. Install Nvidia GPU driver
+
+```bash
+sudo apt-get update
+sudo apt install nvidia-headless-535 nvidia-utils-535 libnvidia-encode-535
+sudo modprobe nvidia
+nvidia-smi
+```
+
+## 5. Install Docker CE
+
+```bash
+curl https://get.docker.com | sh && sudo systemctl --now enable docker
+sudo groupadd docker
+sudo usermod -aG docker $USER
+newgrp docker
+groups
+```
+
+## 6. Install Nvidia Container Toolkit
+
+```bash
+curl -fsSL https://nvidia.github.io/libnvidia-container/gpgkey | sudo gpg --dearmor -o /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg \
+&& curl -s -L https://nvidia.github.io/libnvidia-container/stable/deb/nvidia-container-toolkit.list | \
+sed 's#deb https://#deb [signed-by=/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg] https://#g' | \
+sudo tee /etc/apt/sources.list.d/nvidia-container-toolkit.list
+
+sudo apt-get update
+
+export NVIDIA_CONTAINER_TOOLKIT_VERSION=1.17.8-1
+sudo apt-get install -y \
+nvidia-container-toolkit=${NVIDIA_CONTAINER_TOOLKIT_VERSION} \
+nvidia-container-toolkit-base=${NVIDIA_CONTAINER_TOOLKIT_VERSION} \
+libnvidia-container-tools=${NVIDIA_CONTAINER_TOOLKIT_VERSION} \
+libnvidia-container1=${NVIDIA_CONTAINER_TOOLKIT_VERSION}
+
+sudo nvidia-ctk runtime configure --runtime=docker
+
+sudo systemctl restart docker
+```
+
+## 7. Install Docker Compose
+
+```bash
+sudo curl -L https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m) -o /usr/local/bin/docker-compose
+sudo chmod +x /usr/local/bin/docker-compose
+docker-compose version
+```
+
+## 8. Adjust firewall rules (if applicable)
+
+```bash
+sudo ufw allow 22/tcp comment 'accept SSH'
+sudo ufw allow 80/tcp comment 'accept HTTP & HLS'
+sudo ufw allow 443/tcp comment 'accept HTTPS & HLS'
+sudo ufw allow 5353:7999/tcp comment 'accept NDI TCP'
+sudo ufw allow 5353:7999/udp comment 'accept NDI UDP'
+sudo ufw allow 1024:65535/udp comment 'accept MPEG-TS UDP/RTP/SRT'
+sudo ufw allow 1935/tcp comment 'accept RTMP inputs'
+sudo ufw allow from 192.168.0.0/24 to 224.0.0.0/24 proto igmp comment 'accept IGMP'
+sudo ufw allow 319:320/udp comment 'accept PTP messages'
+sudo ufw --force enable
+sudo ufw status
+```
+
+Or disable:
+
+```bash
+sudo ufw disable
+sudo ufw status
+```
+
+## 9. Increase max UDP kernel buffer size
+
+```bash
+SYSCTL_CONF="/etc/sysctl.d/10-udp-buffer-size.conf"
+sudo sh -c "echo '#kernel send a receive windows buffer sizes' > $SYSCTL_CONF"
+sudo sh -c "echo 'net.core.rmem_max=262144000' >> $SYSCTL_CONF"
+sudo sh -c "echo 'net.core.wmem_max=262144000' >> $SYSCTL_CONF"
+sudo sh -c "echo 'net.core.rmem_default=262144000' >> $SYSCTL_CONF"
+sudo sh -c "echo 'net.core.wmem_default=262144000' >> $SYSCTL_CONF"
+sudo sh -c "echo '' >> $SYSCTL_CONF"
+sudo sysctl -p $SYSCTL_CONF
+```
+
+## 10. Increase txqueuelen for network interfaces
+
+```bash
+sudo bash -c 'cat > /etc/udev/rules.d/80-txqueuelen.rules' << EOF
+SUBSYSTEM=="net", ACTION=="add|change", KERNEL=="e*", ATTR{tx_queue_len}="10000"
+EOF
+
+sudo udevadm control --reload-rules && sudo udevadm trigger
+```
+
+## 11. Install DOCA-OFED for Nvidia ConnectX
+
+```bash
+wget https://www.mellanox.com/downloads/DOCA/DOCA_v3.0.0/host/doca-host_3.0.0-058000-25.04-debian125_amd64.deb
+sudo dpkg -i doca-host_3.0.0-058000-25.04-debian125_amd64.deb
+sudo apt-get update
+sudo apt-get -y install doca-all
+sudo reboot
+```
+
+## 12. Install ptp4l
+
+```bash
+sudo apt install linuxptp
+```
+
+## 13. Create ptp4l.conf
+
+```bash
+sudo bash -c 'cat > /etc/linuxptp/ptp4l.conf' << EOF
+[global]
+domainNumber 127
+priority1 255
+priority2 255
+slaveOnly 1
+time_stamping hardware
+tx_timestamp_timeout 30
+use_syslog 1
+logging_level 6
+summary_interval 0
+dscp_event 46
+dscp_general 46
+delay_mechanism E2E
+hybrid_e2e 0
+network_transport UDPv4
+logAnnounceInterval -2
+announceReceiptTimeout 3
+logSyncInterval -3
+logMinDelayReqInterval -3
+message_tag [ptp4l:0:127]
+
+[ens16f0np0]
+EOF
+```
+
+## 14. Assign static IP addr to the Connectx NICs
+
+```bash
+sudo nano /etc/netplan/50-cloud-init.yaml
+```
+
+```yaml
+network:
+  version: 2
+  ethernets:
+    ens18:
+      dhcp4: true
+    ens16f0np0:
+      dhcp4: no
+      addresses:
+        - 192.168.20.237/24
+    ens16f1np1:
+      dhcp4: no
+      addresses:
+        - 192.168.30.237/24
+```
+
+```bash
+sudo netplan apply
+sudo ip link set ens16f0np0 up
+sudo ip link set ens16f1np1 up
+```
+
+Ping Grand Master to check connectivity.
+
+## 15. phc2sys configuration
+
+```bash
+sudo bash -c 'cat > /etc/linuxptp/phc2sys.conf' << EOF
+[global]
+domainNumber 127
+use_syslog 1
+logging_level 6
+
+# Socket for communication between ptp4l and phc2sys.
+
+message_tag [ptp4l:0:127]
+EOF
+```
+
+## 16. phc2sys systemd configuration
+
+```bash
+sudo nano /etc/systemd/system/phc2sys.service
+```
+
+```ini
+[Unit]
+Description=Synchronize system clock from PTP Hardware Clock via ptp4l
+After=ptp4l.service
+Requires=ptp4l.service
+
+[Service]
+ExecStart=/usr/sbin/phc2sys -a -r -f /etc/linuxptp/phc2sys.conf
+
+[Install]
+WantedBy=multi-user.target
+```
+
+## 17. ptp4l system configuration
+
+```bash
+sudo nano /etc/systemd/system/ptp4l.service
+```
+
+```ini
+[Unit]
+Description=PTP Boundary Clock Daemon (ptp4l)
+After=network.target
+
+[Service]
+ExecStart=/usr/sbin/ptp4l -f /etc/linuxptp/ptp4l.conf -i ens16f0np0 -m
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
+```
+
+## 18. Enable/Start ptp4l and phc2sys
+
+```bash
+sudo systemctl daemon-reload
+sudo systemctl enable ptp4l.service
+sudo systemctl enable phc2sys.service
+sudo systemctl start ptp4l.service
+sudo systemctl start phc2sys.service
+```
+
+## 19. Check status and sync of PTP
+
+```bash
+sudo systemctl status ptp4l.service
+sudo systemctl status phc2sys.service
+```
+
+## 20. Expose C Groups v1
+
+```bash
+sudo nano /etc/default/grub
+```
+
+Edit line:
+
+```
+GRUB_CMDLINE_LINUX_DEFAULT="systemd.unified_cgroup_hierarchy=0"
+```
+
+```bash
+sudo update-grub
+sudo reboot
+```
+
+Check if C Groups v1 are now exposed:
+
+```bash
+mount | grep '^cgroup' | awk '{print $1}' | uniq
+```
+
+## 21. Docker login
+
+```bash
+docker login --username comprimato
+```
+
+Token on transcoder dashboard.
+
+## 22. Upload docker-compose.yml
+
+Please contact [support@comprimato.com](mailto:support@comprimato.com) for the docker-compose.yml for the Twenty-One Encoder docker, this differs from the docker-compose.yml for Live Transcoder that is available on the transcoder dashboard.
+
+The example of 21 encoder's docker-compose yaml file is available [HERE](https://git.cmpto.cz/transcoder/transcoder/-/blob/master/docker_lt_9/docker-compose-twentyone-encoder.yml?ref_type=heads).
+
+## 23. Start the 21 Encoder docker container
+
+```shell
+docker compose -f <RECEIVED-DOCKER-COMPOSE-FILE> up -d
+```
+
+## 24. Upload Rivermax.lic to container
+
+After the 23rd step, the directory named `rivermax` is created in the directory where the received docker file is placed.
+Copy your `rivermax.lic` file into this folder by:
+
+```shell
+sudo cp rivermax.lic <YOUR-COMPOSE-FILE-DIRECTORY>/rivermax/
+```
+
+When it is done, the docker container does not need to be redeployed, and the 2110 pipelines can be used.

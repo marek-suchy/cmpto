@@ -1,0 +1,93 @@
+---
+title: Launch host instance
+hide_title: false
+---
+
+We provide Live Transcoder as a Docker container downloadable from DockerHub. Therefore you need to have a host instance to run the Docker container on.
+
+Live Transcoder needs an Nvidia GPU to work, so you need to use an instance with Nvidia GPU. In Oracle Cloud, we recommend [GPU2](https://www.oracle.com/cloud/compute/gpu/) instance shapes with Nvidia Tesla P100 GPUs as they provide a good price/performance ratio, specifically the **VM.GPU2.1** shape. We do not support Ada or Hopper architectures yet.
+
+# Select the region
+
+We recommend selecting the region closest to you for the lowest latency. However, GPU instance prices and availability vary between regions, so you may check other regions as well.
+
+# Select the right instance size
+
+* We recommend you start with **VM.GPU2.1** (12 OCPUs, single Nvidia Tesla P100) and change the instance shape if needed.
+* Generally, you'll need two OCPUs per 1080p h264 4:2:0 8bit stream and sixteen OCPUs per 1080p h264 4:2:2 10bit stream, but this may vary with the resolution/quality/codec used.
+* We strongly recommend you increase the instance size (vCPUs) if the overall CPU utilization exceeds 80%.
+* Our support can help you choose the right instance size.
+
+# GPU instance limit
+
+* Oracle Cloud limits how many GPU instances a user can run.
+
+## Check your current limits
+
+* You can check your current limit for your region on the [Limits](https://cloud.oracle.com/limits) page. You need to specify the **AD** (availability domain) in Scope to see the GPU limits. Search for `GPUs for GPU2 based VM and BM Instances` (VM.GPU**2**.1, therefore GPU**2**). Your current quota is the `Service Limit` column.
+
+![](/img/cloud-deployment/oci-gpu2-quota.png)
+
+* The quota value says the maximum number of instances of this shape you can run in total.
+
+## Quota increase request
+
+* You can request the quota increase, but Oracle needs to apply your request.
+* These limits are applied per region and AD (availability domain), so you must request the quota increase in all regions/AD you plan to run Live Transcoder.
+* If you are unsure what value request, ask our support, they can help you choose the best value.
+* When your quota is increased, you can launch the host instance.
+
+# Firewall rules
+
+By default, all network ports except SSH are closed for incoming traffic by the Oracle Cloud firewall feature called "Network Security Groups" and must be enabled manually to receive traffic. Live Transcoder needs these ports opened:
+
+* SSH (TCP port 22) - for SSH
+* HTTP (TCP port 80) - needed for access to web UI and HLS output
+* HTTPS (TCP port 443) - needed for secure access to web UI and HLS output
+* MPEG-TS over RTP/UDP/SRT (UDP ports) - add custom ports for your MPEG-TS streams
+* NDI (TCP&UDP) - needed for NDI to work, the easiest way is to open port range 5353-7999 for both TCP & UDP [[NDI docs](https://ndi.tv/tools/education/networking/best-practices/networking-best-practice/)]
+* RTMP input (TCP port 1935) - needed for RTMP server to listen on this port
+
+## Create a new security group
+
+Network Security Groups belong to VCN (Virtual Cloud Network) level. You can create a new one there. You'll attach the security group to your instance later during the creation of the instance.
+
+![](/img/cloud-deployment/oci-vcn.png)
+
+We recommend naming the security group `live-transcoder-group`. You can reuse it later (or modify it) for another Live Transcoder instance.
+
+# Create the compute instance
+
+Head to the Instances page and create a new instance.
+
+## Images and shapes
+
+Use the Oracle Linux 8 image. Select your preferred GPU shape.
+
+![](/img/cloud-deployment/oci-images-and-shapes.png)
+
+## Networking
+
+In Advanced Options, enable the use of Network Security Groups and select the one you've previously created.
+
+## SSH keys
+
+* a.k.a. SSH private key
+* It's used to ssh to the instance terminal.
+* Oracle cloud won't show you the key again.
+* Download it and keep it safe.
+
+## Boot volume (storage)
+
+Live Transcoder itself needs 100GiB of storage.
+
+If you plan to use HLS outputs heavily, increase the value by additional [calculated storage](../../faq/hls-storage-calculation).
+
+![](/img/cloud-deployment/oci-boot-volume.png)
+
+:::warning
+When using an instance with a smaller storage capacity, it is important to note that a significant portion of the free space is used for storing log messages in the journal. These log messages are crucial for diagnostics. Insufficient space for the journal can limit the ability to diagnose issues with the instance effectively.\
+To manage disk space efficiently, ensure you set the correct size for `SystemKeepFree=` and `RuntimeKeepFree=` in `/etc/systemd/journald.conf`.
+:::
+
+## Create it!

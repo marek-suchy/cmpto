@@ -1,0 +1,65 @@
+---
+title: How to Downgrade
+sidebar_position: 4
+---
+
+This guide explains how to revert Live Transcoder to a previous version if needed.
+
+## Prerequisites
+
+- SSH access to the host instance
+- A previously pulled Docker image available locally
+
+## Steps
+
+### 1. Connect to Your Host Instance
+
+```bash
+ssh -i your-key.pem <user>@<your-public-ip>
+```
+
+### 2. List Available Local Images
+
+```bash
+docker image ls
+```
+
+Identify the image ID or tag of the version you want to roll back to. Previously used images are stored locally unless explicitly removed.
+
+### 3. Edit docker-compose.yml
+
+Navigate to the directory containing your `docker-compose.yml` (typically `/home/<your_user>/`):
+
+```bash
+nano docker-compose.yml
+```
+
+Replace the image reference:
+
+```yaml
+# Change from:
+    image: comprimato/live-transcoder:latest
+
+# To the specific image ID or version tag, for example:
+    image: comprimato/live-transcoder:1.17.0
+# or using an image ID:
+    image: <image-id>
+```
+
+Save the file.
+
+### 4. Deploy the Previous Version
+
+```bash
+docker-compose up -d
+```
+
+### 5. Verify the Downgrade
+
+Open the web UI and navigate to **Setup > System Information** to confirm the build version matches the expected version.
+
+## No Previous Images Available
+
+:::warning
+If no previous images are present locally, contact [Comprimato Support](../advanced/contact-details) for assistance. The support team can provide the required image.
+:::

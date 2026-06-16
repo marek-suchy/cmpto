@@ -1,0 +1,70 @@
+---
+title: NDI
+sidebar_label: NDI
+---
+
+# 7.0 NDI
+
+Network Device Interface (NDI) is a high-performance standard that allows anyone to use real-time, ultra-low latency video on existing IP video networks.
+
+NDI is part of the Twenty-One Encoder and here is how to use it.
+
+## 7.1 Configuring NDI input
+
+In the detected NDI list you can see all available NDI sources on the local network.
+
+*Figure: NDI CONFIGURATION*
+
+If you want to start using a listed NDI input, just select it in the list. It will be set to the Selected NDI field. In some cases, you may want to set the NDI source name manually (e.g., when it's not yet running). You can do so by filling in the Selected NDI field yourself. Please make sure the name is filled in exactly.
+
+*Figure: NDI DETECTING INPUT*
+
+Then you can **click the Start Detecting Input** button to get the NDI feed configuration.
+
+## 7.2 Configuring NDI input in non-default NDI group
+
+NDI allows sources to be part of so-called NDI groups. A source can be a part of any number of groups and is findable only if the corresponding group is specified.
+
+To specify an NDI group to find a source in or get a list of detected sources in the group, please allow NDI options and enter the group name into the corresponding field. Once the field is filled, the list of detected sources is updated with the sources found in the selected group.
+
+The NDI group name field can also contain a comma-separated list of groups, all of them will be used to search for the specified NDI source and to list the detected sources. The default group name is 'public' so if the NDI options are not allowed or the NDI group name field isn't set, the sources are detected in the 'public' group. (edited)
+
+*Figure: NDI GROUP INPUT*
+
+## 7.3 Configuring NDI output
+
+When you run NDI output, it will appear on the local network as an NDI source with your chosen NDI name in the ”HOSTNAME (NDI name)” format.
+
+*Figure: NDI OUTPUT*
+
+## 7.4 Configuring NDI output in non-default NDI group
+
+NDI allows sources to be part of so-called NDI groups. A source can be a part of any number of groups and is findable only if the corresponding group is specified.
+
+To specify an NDI group for an NDI output, please allow NDI options and enter the group name into the corresponding field.
+
+*Figure: NDI GROUP OUTPUT*
+
+## 7.5 NDI output HDR (TBD)
+
+NDI 6 (or higher) supports 16-bit data formats and standardizes metadata elements to specify wide gamut color primaries and HDR transfer functions, including HLG and PQ. This enables broadcasting high bit depth, wide color gamut, and high dynamic range video, with brightness up to 10000 nits when using the PQ transfer function.
+
+To mark the output NDI video as HDR, the video bit depth must be at least 10 bit. Then you can allow NDI options and select the desired transfer function from the dropdown menu of the Mark as HDR field. Note that there is no conversion done, only metadata is added. NDI 6 (or higher) is required on the receiver side.
+
+## 7.6 NDI discovery server
+
+If you are trying to point the NDI output of Twenty-One Encoder to one or more NDI Discovery Servers, you have to change the appropriate parameter in the .ini configuration file in the Advanced setup:
+
+Find and replace the line containing **NDI_DISCOVERY=** with the destination IP(s) of the NDI Discovery server(s). Use commas to separate multiple servers, e.g.,
+
+**NDI_DISCOVERY=192.168.101.55,192.168.101.56**
+
+Warning: When the NDI Discovery Server is set, the NDI output (sender) doesn’t propagate itself using mDNS, just to the Discovery Server. NDI input (receiver) receives traffic from both mDNS and Discovery Server. This is how NDI works and you can’t change it.
+
+#### Q: I can’t discover Twenty-one encoder’s NDI output
+
+Check that your network interface is configured for “Input/Output” or “Input/Output and Administration” in the UI Setup. This effectively configures the firewall in the OS.
+
+#### Q: I can discover Twenty-one encoder’s NDI output, but it doesn’t play
+
+Since NDI 5, NDI uses RUDP (Reliable UDP) as a communication protocol.  Some network cards have problems with RUDP. In the NDI Access Manager application on your receiver device, you can set the “Receiver Mode” to “Single-TCP” and restart both the NDI output pipeline in Twenty-one encoder and the NDI application on your receiver device.

@@ -1,0 +1,70 @@
+---
+title: I Can't Get to the Web UI
+sidebar_position: 1
+---
+
+If you cannot access the Live Transcoder web UI, use this guide to identify and resolve the issue.
+
+## A) Browser Cannot Load the Page
+
+If the browser shows a **connection timeout** or refuses to connect, check the following:
+
+### Firewall Configuration
+
+- **On-premises:** Verify that ports 80 and 443 are open in the host OS firewall (e.g., `ufw`, `firewalld`).
+- **Cloud providers:** Check that your security group or network security group allows inbound HTTP/HTTPS traffic. See the installation guide for your platform for the required port list.
+
+### Static IP Address
+
+The Live Transcoder web UI must be reached via a stable IP address. Without a static/elastic IP, the public IP changes every time the instance is stopped and started.
+
+- **AWS:** Assign an Elastic IP to your EC2 instance.
+- **GCP / Azure / OCI:** Reserve a static public IP and assign it to your VM.
+
+### Container Status
+
+Verify the transcoder container is running:
+
+```bash
+docker ps
+```
+
+The `transcoder0` container should appear with status `Up`. If it is absent, recreate it:
+
+```bash
+docker-compose up -d
+```
+
+## B) Page Loads but Shows a Loading Spinner
+
+If the browser connects but the UI shows a persistent loading message, the Live Transcoder service inside the container failed to start.
+
+### Check Service Status
+
+```bash
+systemctl status transcoder-base
+```
+
+### Restart the Service
+
+```bash
+sudo systemctl restart transcoder-base
+```
+
+### Review Logs
+
+```bash
+journalctl -u transcoder-base -n 100
+```
+
+### Check GPU Detection
+
+```bash
+nvidia-smi
+```
+
+If `nvidia-smi` fails, the Nvidia driver may not be loaded correctly. Refer to [GPU Codec Troubleshooting](../run/gpu-codec-troubleshooting) or [GPU Visibility in Docker](./gpu-visibility-docker).
+
+## Still Stuck?
+
+Collect a diagnostics package from the web UI (**Setup > Diagnostics & Support**) once the UI is accessible, and contact [Comprimato Support](../advanced/contact-details).

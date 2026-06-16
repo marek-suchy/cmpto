@@ -1,0 +1,42 @@
+---
+title: Pipeline Creation Failed
+sidebar_position: 5
+---
+
+## Error: "Pipeline creation failed! Nvidia GPU is required to run this pipeline with GPU postprocessor."
+
+This error occurs when Live Transcoder cannot access an Nvidia GPU that is required for the selected pipeline configuration.
+
+## Cause 1: No Nvidia GPU Present
+
+The host instance does not have an Nvidia GPU.
+
+**Resolution:** Provision a machine with a supported Nvidia GPU. See the installation guide for your platform:
+
+- [AWS — Launch Host Instance](../installation/aws/launch-host-instance)
+- [Google Cloud — Launch Host Instance](../installation/google-cloud/launch-host-instance)
+- [Oracle Cloud — Launch Host Instance](../installation/oracle-cloud/launch-host-instance)
+- [Azure — Launch Host Instance](../installation/azure/launch-host-instance)
+- [On-Premises — Hardware Requirements](../installation/on-prem/hw-requirements)
+
+Alternatively, use a [CPU-only pipeline](../run/running-without-gpu) if your use case is supported without a GPU.
+
+## Cause 2: Outdated Nvidia Driver
+
+An outdated Nvidia driver can prevent the system from accessing GPU resources even if a GPU is physically present.
+
+**Resolution:** Update the Nvidia driver to version **535 or later**, or perform a fresh OS installation using a current AMI/image that includes up-to-date drivers.
+
+After updating, verify the driver is working:
+
+```bash
+nvidia-smi
+```
+
+Then confirm GPU visibility inside the Docker container:
+
+```bash
+docker exec -it transcoder0 nvidia-smi
+```
+
+If the GPU is visible on the host but not in the container, see [GPU Visibility in Docker](./gpu-visibility-docker).

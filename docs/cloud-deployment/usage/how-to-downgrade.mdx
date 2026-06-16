@@ -1,0 +1,28 @@
+---
+title: How to downgrade
+hide_title: false
+---
+
+If a downgrade from the latest image is needed please use the following steps:
+
+1. SSH to the host instance
+
+2. Run `docker image ls` to list all previous docker images
+
+3. ![](/img/cloud-deployment/downgrade-docker-images.png)
+
+   Copy to clipboard the `IMAGE ID` of the desired container image. If no previous images are present please contact [support@comprimato.com](mailto:support@comprimato.com) and we will assist with next steps.
+
+4. Find the docker-compose.yml file. This should be in the following location: `/home/your_user`. If you cannot find the docker-compose.yml please use the following guide to obtain it [https://docs.transcoder.comprimato.com/v1.15.5/docs/run-docker-container](https://docs.transcoder.comprimato.com/v1.15.5/docs/run-docker-container)
+
+5. Edit the docker-compose.yml in your chosen text editor. Replace `image: "comprimato/live-transcoder:latest"` with the `IMAGE ID` you copied earlier i.e. `image: "IMAGE ID"`
+
+6. Save the changes to the docker-compose.yml
+
+7. Run `docker-compose up -d`. This will compose Live Transcoder container from the `IMAGE ID` you selected.
+
+8. ![](/img/cloud-deployment/downgrade-compose-up.png)
+
+9. Verify the build version using the web UI > Setup > System Information
+
+![](/img/cloud-deployment/downgrade-verify-version.png)

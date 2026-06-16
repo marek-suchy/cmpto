@@ -1,0 +1,59 @@
+---
+title: Troubleshooting GPU Visibility in Docker Containers
+sidebar_position: 9
+---
+
+If the GPU is accessible on the host via `nvidia-smi` but is not visible inside the Docker container, follow the steps below.
+
+## Step 1: Verify the docker-compose.yml Configuration
+
+The `docker-compose.yml` must include a GPU device reservation with `count: all` to expose all available GPUs to the container:
+
+```yaml
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+```
+
+If this section is missing or incorrect, obtain an updated `docker-compose.yml` from the [Comprimato Customer Dashboard](https://transcoder.comprimato.com) as described in [Run Docker Container](../run/run-docker-container).
+
+## Step 2: Verify NVIDIA Container Toolkit Installation
+
+Confirm the NVIDIA Container Toolkit is installed on the host:
+
+```bash
+dpkg -l | grep nvidia-container-toolkit
+```
+
+If it is not installed, follow the installation steps in the preparation guide for your platform. If it is installed but on a version between 1.17.8 and 1.18.0, downgrade to 1.17.7-1:
+
+```bash
+sudo apt-get install -y nvidia-container-toolkit=1.17.7-1
+sudo systemctl restart docker
+```
+
+## Step 3: Restart the Container
+
+After making any configuration changes, recreate the container:
+
+```bash
+docker-compose up -d --force-recreate
+```
+
+## Step 4: Validate GPU Visibility Inside the Container
+
+Run `nvidia-smi` inside the running container to confirm GPU access:
+
+```bash
+docker exec -it transcoder0 nvidia-smi
+```
+
+A successful output showing GPU details confirms that GPU visibility is working correctly.
+
+## Still Not Working?
+
+If the above steps do not resolve the issue, see [GPU Codec Troubleshooting](../run/gpu-codec-troubleshooting) for additional workarounds, or contact [Comprimato Support](../advanced/contact-details).

@@ -1,0 +1,82 @@
+---
+title: Run Docker Container
+sidebar_position: 1
+---
+
+This guide explains how to authenticate with the Comprimato Docker registry and deploy Live Transcoder using Docker Compose.
+
+## Prerequisites
+
+- A DockerHub personal access token from the [Customer Dashboard](https://transcoder.comprimato.com)
+- A configured `docker-compose.yml` file with your license key
+
+## 1. Authenticate with DockerHub
+
+Log in to DockerHub using the Comprimato username and your personal access token:
+
+```bash
+docker login --username comprimato
+```
+
+When prompted for a password, enter your personal access token. Tokens have the format:
+
+- New format: `dckr_pat_XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX`
+- Legacy format: UUID (e.g., `64544bd5-8df6-490c-bce7-468d035a8b1a`)
+
+## 2. Obtain the docker-compose.yml File
+
+You can obtain the `docker-compose.yml` in three ways:
+
+**Option A — WGET command from the Customer Dashboard:**
+
+The Dashboard provides a ready-to-use `wget` command. Copy and run it on your host instance to download the file directly.
+
+**Option B — Download and SCP:**
+
+Download the file from the Dashboard and transfer it to your host instance:
+
+```bash
+scp -i your-key.pem docker-compose.yml ubuntu@<your-public-ip>:~/
+```
+
+**Option C — Extract from Docker image metadata:**
+
+```bash
+docker pull comprimato/live-transcoder:latest
+docker inspect comprimato/live-transcoder:latest | \
+  python3 -c "import sys,json,base64; \
+  data=json.load(sys.stdin); \
+  print(base64.b64decode(data[0]['Config']['Labels']['docker-compose']).decode())" \
+  > docker-compose.yml
+```
+
+## 3. Verify the docker-compose.yml
+
+Open the file and confirm:
+
+- The **image tag** matches the version you want to deploy (e.g., `comprimato/live-transcoder:1.18.0`)
+- The **license key** (`TRC_LICENSE_KEY`) is set correctly — not a placeholder
+
+```bash
+nano docker-compose.yml
+```
+
+## 4. Start the Container
+
+```bash
+docker-compose up -d
+```
+
+## 5. Verify the Container is Running
+
+```bash
+docker ps
+```
+
+You should see `transcoder0` listed with status `Up`.
+
+## Troubleshooting
+
+- **GPU not visible in container:** See [GPU Visibility in Docker](../troubleshooting/gpu-visibility-docker)
+- **Running without a GPU:** See [Running Without GPU](./running-without-gpu)
+- **GPU codec errors:** See [GPU Codec Troubleshooting](./gpu-codec-troubleshooting)

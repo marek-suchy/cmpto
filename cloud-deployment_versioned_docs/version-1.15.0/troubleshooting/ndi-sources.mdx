@@ -1,0 +1,48 @@
+---
+title: I Can't See My NDI Sources
+sidebar_position: 2
+---
+
+If NDI sources are not appearing in Live Transcoder, two main causes are described below.
+
+## Cause 1: mDNS Conflict (avahi-daemon)
+
+NDI uses mDNS (via `avahi-daemon` on Linux) to discover sources on the local network. When both the Docker container and the host OS run `avahi-daemon` simultaneously, they conflict and NDI discovery fails.
+
+### Solution
+
+Disable and stop the host-level `avahi-daemon`:
+
+```bash
+sudo systemctl stop avahi-daemon
+sudo systemctl disable avahi-daemon
+```
+
+Then restart the Live Transcoder container:
+
+```bash
+docker-compose up -d --force-recreate
+```
+
+:::note
+This is one of the standard setup steps covered in all platform preparation guides. If you followed the preparation guide, avahi-daemon should already be removed.
+:::
+
+## Cause 2: Cloud Network Isolation or Firewall
+
+In cloud environments (AWS, Google Cloud, Oracle Cloud, Azure), NDI discovery may fail due to network topology or firewall rules.
+
+### Network Isolation
+
+The Live Transcoder instance and your NDI sources must reside in the **same VPC or subnet** (or have appropriate routing between them) for mDNS-based discovery to work.
+
+### Firewall Rules
+
+Ensure that the following ports are open **between** your NDI sources and the Live Transcoder instance:
+
+| Port Range | Protocol | Purpose |
+|---|---|---|
+| 5353 | UDP | mDNS (NDI discovery) |
+| 5353–7999 | TCP/UDP | NDI data streams |
+
+Review your cloud provider's security group or network security group configuration and add the necessary rules if missing.

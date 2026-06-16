@@ -1,0 +1,56 @@
+---
+title: On-prem installing Live Transcoder
+hide_title: false
+---
+
+### Create bootable disk from ISO
+
+Although our preferred distribution channel is a docker image, we also offer an alternative - ISO installation file.
+
+You can either copy it on a dedicated USB flash drive (using a tool such as [UNetbootin](https://unetbootin.github.io/)) or use a remote network mount to attach it to the destination server unit.
+
+If you use the USB key option, set the drive as a boot device in BIOS. Make sure to allow support for legacy non-UEFI devices.
+
+Once booted, there is a welcome screen, as shown in Figure 1. Select an option `Start Transcoder Installer` to commence the installation or wait until the time interval runs out.
+
+![Figure 1. Live Transcoder installer's menu](/img/cloud-deployment/Installer.jpg)
+
+*Figure 1. Live Transcoder installer's menu*
+
+### Manual installation
+
+Following are the steps to select the parameters of the installation. The installation wizard is a command-line environment where you need to have a keyboard to provide your input. Overall, there are nine steps to go through:
+
+Before the installation can be commenced, please take time to read and accept Comprimato End User License Agreement (EULA).
+
+1. Select the target disk where the software should be installed. The installer will do all necessary work, such as creating partitions and formatting.
+
+   :::warning WARNING!
+   After the installation is triggered, the target HDD is formatted, and all unsaved data is permanently lost. (All other HDDs are left untouched.)
+   :::
+
+2. Transcoder machine hostname.\
+   Type your desired name of the machine.
+
+3. Time zone selection. Select the time zone of your location (Region & Country) correctly. It is essential for proper Transcoder functionality. Double-check and confirm the selection.
+
+4. Network interface for administration.\
+   The assigned IP address is used to access the web-based graphical User Interface for Transcoder.
+
+5. Interface IP address configuration. Adding the static value or DHCP to the previously selected interface. Before the configuration is finalized after the first boot, this is the only unblocked port in the firewall.
+
+6. User accounts password.
+   1. Provide the web UI password you will use to access the UI. The default user account is admin; it can be changed later from the system's console.
+   2. Provide the password for the default user account transcoder that is used for terminal or SSH access.
+
+7. Confirmation.\
+   The last step is to confirm the selected settings. In case you choose 'no', you can change any of the available settings and continue.
+
+8. Installation process.
+
+9. Reboot.\
+   After the installation is successfully completed, you can reboot the machine by pressing any key.
+
+   :::warning WARNING!
+   Do not remove the installation media before the reboot!
+   :::

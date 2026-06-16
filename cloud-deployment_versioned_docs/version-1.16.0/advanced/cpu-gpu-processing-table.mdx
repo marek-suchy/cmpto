@@ -1,0 +1,34 @@
+---
+title: CPU-GPU Multimedia Processing Table
+sidebar_position: 5
+---
+
+This reference table indicates which hardware resources — CPU, GPU (NVENC/NVDEC), or both — are used for each decode and encode operation in Live Transcoder. Use it to size your host instance for a given pipeline configuration.
+
+## How to Use This Table
+
+When planning a pipeline, identify each decode and encode step, then use this table to determine whether those operations consume CPU, GPU, or both. Sum the resource requirements across all concurrent pipelines to estimate total host resource needs.
+
+:::note
+The source of truth for the visual processing table is embedded in the Live Transcoder documentation at [docs.transcoder.comprimato.com/docs/cpu-gpu-multimedia-processing-table](https://docs.transcoder.comprimato.com/docs/cpu-gpu-multimedia-processing-table). Refer to the original page for the latest version of the table image.
+:::
+
+## General Principles
+
+- **NVDEC** is used for hardware-accelerated video decoding on Nvidia GPUs (Turing architecture and newer).
+- **NVENC** is used for hardware-accelerated video encoding on Nvidia GPUs.
+- **CPU** processing is used for operations not supported by NVDEC/NVENC, for passthrough pipelines, or when running in [CPU-only mode](../run/running-without-gpu).
+- GPU utilization figures in the monitoring dashboard show NVENC and NVDEC independently, so combined values can exceed 100%.
+
+## Resource Sizing Tips
+
+- Aim to keep **CPU utilization below 75%** and **NVENC/NVDEC utilization below 75%** during active pipeline operation.
+- For framerate conversion with motion compensation, CPU requirements increase significantly — a single 1080p 50→60 fps conversion may require 48 or more vCPUs.
+- For codec cross-conversion (e.g., H.264 to H.265), GPU resources dominate.
+- Refer to the [Performance Testing](./performance-testing) guide for measured benchmarks on specific AWS instance types.
+
+## Related Resources
+
+- [Performance Testing](./performance-testing)
+- [Running Without GPU](../run/running-without-gpu)
+- [Error: Some Video Frames Are Being Dropped](../troubleshooting/frame-dropping)

@@ -1,0 +1,116 @@
+---
+title: Prepare host OS
+hide_title: false
+---
+
+# SSH to the host OS
+
+You can find the instance's public IP address in the list of instances (EC2 / Instances).
+
+![](/img/cloud-deployment/aws-instance-details.png)
+
+Ubuntu's default user is `ubuntu`, use the following command to SSH to your instance (to the host OS). On Linux and macOS, you'll first need to limit the key file permissions using the `chmod` command.
+
+```shell
+chmod 400 path/to/your-private-key.pem
+```
+
+```shell
+ssh -i path/to/your-private-key.pem ubuntu@INSTANCE_IP
+```
+
+# Update the OS
+
+```shell
+sudo apt update && sudo apt upgrade -y
+```
+
+# `docker-compose` installation
+
+We use the `docker-compose` tool for making it easier to launch our Docker container. Use the following command to install the `docker-compose` tool.
+
+```shell
+sudo curl -L https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m) -o /usr/local/bin/docker-compose
+sudo chmod +x /usr/local/bin/docker-compose
+```
+
+Next, check that the `docker-compose` tool is successfully installed. The following command should return meaningful output.
+
+```shell
+docker-compose version
+```
+
+# Configure cgroup settings
+
+Edit the Configuration File `/etc/docker/daemon.json` and add or modify the cgroup-related settings:
+
+```json
+{
+  "default-cgroupns-mode": "host"
+}
+```
+
+If your `daemon.json` file already contains the runtimes configuration for NVIDIA, you can simply add additional configuration for cgroup settings without overwriting the existing content.
+
+```json
+{
+    "runtimes": {
+        "nvidia": {
+            "args": [],
+            "path": "nvidia-container-runtime"
+        }
+    },
+    "default-cgroupns-mode": "host"
+}
+```
+
+Save the file and restart the Docker daemon to apply the changes:
+
+```shell
+sudo systemctl restart docker
+```
+
+# Disable mDNS on the host
+
+The mDNS service mustn't be active in the host OS for NDI discovery to work. If present, this command removes it from the host OS:
+
+```shell
+sudo dpkg -l | grep "avahi-daemon"
+sudo apt remove --purge avahi-daemon -y
+```
+
+# Increase max UDP kernel buffer size
+
+Live Transcoder needs an increased UDP kernel buffer size. However, the default maximum size in the AMI is too low so it needs to be increased.
+
+```shell
+SYSCTL_CONF="/etc/sysctl.d/10-udp-buffer-size.conf"
+sudo sh -c "echo '#kernel send a receive windows buffer sizes' > $SYSCTL_CONF"
+sudo sh -c "echo 'net.core.rmem_max=262144000' >> $SYSCTL_CONF"
+sudo sh -c "echo 'net.core.wmem_max=262144000' >> $SYSCTL_CONF"
+sudo sh -c "echo 'net.core.rmem_default=262144000' >> $SYSCTL_CONF"
+sudo sh -c "echo 'net.core.wmem_default=262144000' >> $SYSCTL_CONF"
+sudo sh -c "echo '' >> $SYSCTL_CONF"
+```
+
+Now load the updated config file.
+
+```shell
+sudo sysctl -p $SYSCTL_CONF
+```
+
+# Increase txqueuelen for network interfaces
+
+To stream out high-bitrate codecs (e.g., JPEG2000 or JPEG-XS), also `txqueuelen` parameter should be increased for the respective network interface(s). Below, we set the parameter for all available Ethernet network interfaces (by using `KERNEL=="e*"`):
+
+```shell
+sudo bash -c 'cat > /etc/udev/rules.d/80-txqueuelen.rules' << EOF
+SUBSYSTEM=="net", ACTION=="add|change", KERNEL=="e*", ATTR{tx_queue_len}="10000"
+EOF
+```
+
+To apply the changes immediately, run:
+
+```shell
+sudo udevadm control --reload-rules && sudo udevadm trigger
+```

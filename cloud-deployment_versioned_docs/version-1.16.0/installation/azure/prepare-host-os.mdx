@@ -1,0 +1,155 @@
+---
+title: Prepare Host OS
+sidebar_position: 2
+---
+
+This guide covers the required OS configuration steps for an Azure VM before running Live Transcoder.
+
+## 1. Connect via SSH
+
+The default Azure user is `azureuser`. Set permissions on your private key and connect:
+
+```bash
+chmod 400 your-key.pem
+ssh -i your-key.pem azureuser@<your-public-ip>
+```
+
+## 2. Disable nouveau and Install Nvidia GPU Drivers
+
+Blacklist the `nouveau` open-source driver:
+
+```bash
+echo "blacklist nouveau" | sudo tee /etc/modprobe.d/blacklist-nouveau.conf
+echo "options nouveau modeset=0" | sudo tee -a /etc/modprobe.d/blacklist-nouveau.conf
+sudo update-initramfs -u
+sudo reboot
+```
+
+After reconnecting, install Nvidia driver version 535 and associated utilities:
+
+```bash
+sudo apt install -y nvidia-driver-535 nvidia-utils-535
+sudo reboot
+```
+
+Verify after reboot:
+
+```bash
+nvidia-smi
+```
+
+## 3. Install Docker CE
+
+```bash
+curl -fsSL https://get.docker.com | sudo sh
+sudo usermod -aG docker $USER
+newgrp docker
+```
+
+## 4. Install NVIDIA Container Toolkit
+
+:::warning
+Versions **1.17.8–1.18.0** of the NVIDIA Container Toolkit have known issues with GPU passthrough. Install version **1.17.7-1** specifically.
+:::
+
+```bash
+distribution=$(. /etc/os-release; echo $ID$VERSION_ID)
+curl -s -L https://nvidia.github.io/nvidia-docker/gpgkey | sudo apt-key add -
+curl -s -L https://nvidia.github.io/nvidia-docker/$distribution/nvidia-docker.list | \
+  sudo tee /etc/apt/sources.list.d/nvidia-docker.list
+sudo apt update
+sudo apt install -y nvidia-container-toolkit=1.17.7-1
+sudo systemctl restart docker
+```
+
+## 5. Install Docker Compose
+
+```bash
+sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" \
+  -o /usr/local/bin/docker-compose
+sudo chmod +x /usr/local/bin/docker-compose
+```
+
+## 6. Increase UDP Kernel Buffer Sizes
+
+For streams exceeding 21 Mbps, increase UDP buffer limits:
+
+```bash
+sudo sysctl -w net.core.rmem_max=262144000
+sudo sysctl -w net.core.wmem_max=262144000
+```
+
+Persist across reboots by adding to `/etc/sysctl.conf`:
+
+```
+net.core.rmem_max=262144000
+net.core.wmem_max=262144000
+```
+
+Then apply:
+
+```bash
+sudo sysctl -p
+```
+
+## 7. Increase txqueuelen (High-Bitrate Codecs)
+
+For JPEG2000 or JPEG-XS streaming, increase the Ethernet transmit queue length. Create a persistent udev rule:
+
+```bash
+sudo nano /etc/udev/rules.d/99-txqueuelen.rules
+```
+
+Add:
+
+```
+ACTION=="add", SUBSYSTEM=="net", KERNEL=="eth*", RUN+="/sbin/ip link set %k txqueuelen 10000"
+```
+
+Apply immediately:
+
+```bash
+sudo ip link set eth0 txqueuelen 10000
+```
+
+## 8. Remove avahi-daemon (mDNS)
+
+The `avahi-daemon` service conflicts with NDI source discovery. Remove it:
+
+```bash
+sudo apt remove --purge avahi-daemon -y
+```
+
+## 9. Install systemd-coredump
+
+Required for generating diagnostic packages:
+
+```bash
+sudo apt install -y systemd-coredump
+```
+
+## 10. Configure Docker cgroup Mode
+
+Edit `/etc/docker/daemon.json`:
+
+```bash
+sudo nano /etc/docker/daemon.json
+```
+
+Add or merge:
+
+```json
+{
+  "default-cgroupns-mode": "host"
+}
+```
+
+Restart Docker:
+
+```bash
+sudo systemctl restart docker
+```
+
+## Next Step
+
+Proceed to [Run Docker Container](../../run/run-docker-container) to deploy Live Transcoder.

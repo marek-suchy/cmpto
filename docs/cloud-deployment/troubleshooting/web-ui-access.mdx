@@ -1,0 +1,102 @@
+---
+title: I can't get to web UI
+hide_title: false
+---
+
+This can be caused by several reasons. What do you see in your web browser?
+
+# a) Browser can't load the page
+
+![](/img/cloud-deployment/ui-connection-timed-out.png)
+
+## Firewall problem
+
+* have you opened ports in your on-prem host OS firewall?
+* have you opened ports in your cloud provider's firewall (e.g., Security Groups in AWS)
+* check the list of ports to be opened
+
+## Static public IP
+
+* have you set up static public IP (e.g., Elastic IP in AWS)? If not, the public IP is changed with every reboot/shutdown of the host instance.
+
+## Container doesn't run
+
+* `docker ps` command lists Docker containers running on the host. If Live Transcoder (`transcoder0`) isn't there; try recreating it again.
+
+# b) Live Transcoder service failed to start
+
+If your web browser shows you this, then the connection works, but the Live Transcoder service has failed to start.
+
+![](/img/cloud-deployment/ui-trying-to-reach-dashboard.png)
+
+You can get into the container itself to debug the problem further:
+
+```shell
+docker exec -it transcoder0 /bin/bash
+```
+
+First, you can check the status of the Live Transcoder system service inside the container:
+
+```shell
+systemctl status transcoder-base
+```
+
+That should produce similar output:
+
+```
+● transcoder-base.service - Transcoder base service
+   Loaded: loaded (/etc/systemd/system/transcoder-base.service; enabled; vendor preset: disabled)
+   Active: active (running) since Tue 2022-05-31 07:06:36 EDT; 36min ago
+  Process: 37 ExecStartPre=/etc/systemd/system/cmpto-transcoder/transcoder-base-cleanup (code=exited, status=0/SUCCESS)
+ Main PID: 64 (transcoder-base)
+   CGroup: /docker/5c657d9856702717813743c6af6f28666029d1a0756bf4ce10e4d3028be87557/system.slice/transcoder-base.service
+           ├─ 64 /bin/bash /etc/systemd/system/cmpto-transcoder/transcoder-base
+           ├─ 66 ./transcoder
+           ├─ 73 ./transcoder
+           ├─ 78 ./transcoder
+           ├─ 79 ./transcoder
+           └─147 java -Djava.io.tmpdir=/run/transcoder -Dserver.address=127.0.0.1 ...
+```
+
+If it's not active (running), there might be a problem with starting the service. Try restarting the service using:
+
+```shell
+sudo systemctl restart transcoder-base
+```
+
+You can also check detailed logs. This might give you hints about what went wrong.
+
+```shell
+journalctl -u transcoder-base
+```
+
+## Does the container see the Nvidia GPU?
+
+If restarting the service didn't help, check that the Live Transcoder Docker container sees the Nvidia GPU.
+
+```shell
+nvidia-smi
+```
+
+It should produce similar output:
+
+![](/img/cloud-deployment/docker-nvidia-smi.png)
+
+## Has it run before, and now it crashed?
+
+You can help us debug your issue by creating a diagnostic package. Normally, it can be done from the web UI, but it's also possible to do that manually.
+
+Connect to the Docker container and run the diagnostic package collecting script:
+
+```shell
+docker exec -it transcoder0 /bin/bash
+# collect
+# ...
+# /tmp/report-2022-05-31-07_53_21.tar
+```
+
+That produces a tarball archive (`/tmp/report-2022-05-31-07_53_21.tar`) containing logs and core dumps collected from the docker image. Please return to the host, copy the archive and send it to our support.
+
+```shell
+docker cp transcoder0:/tmp/report-2022-05-31-07_53_21.tar .
+```

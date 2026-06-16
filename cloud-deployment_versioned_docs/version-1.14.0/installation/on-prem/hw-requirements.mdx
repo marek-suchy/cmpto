@@ -1,0 +1,29 @@
+---
+title: Hardware Requirements
+sidebar_position: 1
+---
+
+Before deploying Live Transcoder on-premises, ensure your hardware meets the minimum requirements.
+
+## Minimum Hardware Requirements
+
+| Component | Requirement |
+|---|---|
+| **CPU** | x64 architecture |
+| **GPU** | Nvidia GPU — Turing, Ampere, Ada Lovelace, or Blackwell architecture |
+| **Storage** | 256 GB of available disk space (minimum) |
+
+:::warning
+GPU support is limited to the Turing, Ampere, Ada Lovelace, and Blackwell Nvidia architectures. Older GPU generations are not supported.
+:::
+
+## Storage Planning
+
+The 256 GB minimum covers the OS and Live Transcoder itself. If you plan to use HLS outputs, you will need additional storage. See the [HLS Storage Calculation](../../faq/hls-storage-calculation) guide to estimate your requirements.
+
+## Next Steps
+
+Choose your OS and follow the appropriate preparation guide:
+
+- [Prepare Ubuntu Host](./prepare-ubuntu) — for Ubuntu Server 24.04 LTS
+- [Prepare Other OS](./prepare-other-os) — for other Linux distributions

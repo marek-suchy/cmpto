@@ -1,0 +1,58 @@
+---
+title: Prerequisites
+hide_title: false
+---
+
+Please make sure that you meet all the following requirements for using Compute Engine in Google Cloud before continuing to the next page.
+
+### Creating a new Google Cloud project
+
+1. Visit [cloud.google.com](https://cloud.google.com) and sign in to your Google account
+2. Go to *Console* located in the top-right corner
+3. In the top-left corner is a drop-down menu to manage your projects. Click on it and create a new project
+
+![](/img/cloud-deployment/Screenshot_2023-05-19_at_9.54.09_AM.png)
+
+### Enabling billing for a Google Cloud account
+
+To enable billing in your project, please refer to the official Google Cloud [docs](https://cloud.google.com/billing/docs/how-to/modify-project#enable_billing_for_a_new_project).
+
+### Enabling the Compute Engine service
+
+1. On the dashboard, in the top-left corner, open-up menu
+2. Select *APIs & Services* and then *Enabled APIs & services*
+
+![](/img/cloud-deployment/apis.jpg)
+
+3. Click on *Enable APIs and services* button
+
+![](/img/cloud-deployment/Screenshot_2023-05-19_at_10.44.40_AM.png)
+
+4. And finally, find the Compute Engine service and enable it
+
+![](/img/cloud-deployment/Screenshot_2023-05-19_at_10.47.41_AM.png)
+
+### Checking and requesting quotas
+
+1. On the dashboard, in the top-left corner, open-up menu
+2. Select *IAM & Admin* and then click on *Quotas*
+
+![](/img/cloud-deployment/Screenshot_2023-05-19_at_11.04.41_AM.png)
+
+3. On the Quotas page, filter out *Service: Compute Engine*, then find your quota for GPUs and CPUs
+4. You may also filter out the region you'd like to set up the quota for
+5. Once the filter is set, select filtered items by their checkboxes and click on *Edit Quotas*
+
+![](/img/cloud-deployment/Screenshot_2023-05-19_at_10.57.27_AM.png)
+
+6. In the popped-up dialog, specify the new limit for a particular quota and submit your request.
+
+:::note Quota limits recommendation
+
+**Minimum:**
+
+* 4 vCPUs
+* A single GPU
+
+Note that you need at least 48 vCPUs to handle a single fully motion-compensated Framerate/Standards conversion stream at resolution 1920x1080 when converting from 50 FPS to 60 FPS or vice versa.
+:::

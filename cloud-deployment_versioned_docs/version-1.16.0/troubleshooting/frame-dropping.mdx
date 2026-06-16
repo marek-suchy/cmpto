@@ -1,0 +1,46 @@
+---
+title: Error — Some Video Frames Are Being Dropped
+sidebar_position: 6
+---
+
+This error indicates that Live Transcoder cannot process video frames fast enough for the current pipeline configuration, resulting in dropped frames.
+
+## Step 1: Open the Hardware Utilization Dashboard
+
+Click **"Live Transcoder"** in the top-left corner of the web UI to open the hardware utilization dashboard.
+
+## Step 2: Diagnose the Bottleneck
+
+Review the metrics graph and check each of the following dimensions:
+
+### Multiple Pipelines
+
+Does stopping one of your pipelines resolve the error? If yes, your instance does not have enough capacity for the current number of concurrent pipelines. Upgrade to a larger instance.
+
+### GPU Memory
+
+Monitor the **blue GPU memory** indicator against the **Main Memory** total shown in System Information. If GPU memory is saturated, a GPU upgrade or pipeline reduction is needed.
+
+### Network Saturation
+
+The network graph scales to peak usage. Check whether your interface bandwidth (1 Gbps vs. 10 Gbps) is being fully consumed by your streams.
+
+### CPU Load
+
+:::note
+The recommended upper limit for CPU spikes is **70%** while pipelines are active. Sustained usage above this level is a signal to scale up.
+:::
+
+### GPU Utilization
+
+GPU utilization can safely exceed 100% (the percentage shown reflects NVENC/NVDEC independently). However, if GPU utilization is consistently maxed while CPU is underutilized, a GPU hardware upgrade is the appropriate solution.
+
+### Stream Statistics and FPS Drop Counter
+
+Use the per-stream **FPS drop counter** in the pipeline statistics view to identify which specific part of the pipeline is experiencing the bottleneck.
+
+## Resolution
+
+Upgrading to a larger instance type or a higher-performance GPU resolves the issue in most cases when diagnostics confirm a resource constraint.
+
+If you need guidance on instance sizing, refer to the [Performance Testing](../advanced/performance-testing) guide or contact [Comprimato Support](../advanced/contact-details).

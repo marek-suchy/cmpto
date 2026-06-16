@@ -1,0 +1,32 @@
+---
+title: RTMP
+sidebar_label: RTMP
+---
+
+# 5.0 RTMP
+
+The Live Transcoder supports RTMP streams on input, with a user-provided or generated stream key. RTMPS is not supported yet. The RTMP input listens on port **1935** which is the standard port for RTMP protocol.
+
+To generate the stream, click on the Generate random button to generate a unique stream key. If you prefer, you can manually enter a stream key of your choice. Simply type the desired stream key into the provided input field. Once you have either generated a stream key or entered one manually, it’s essential to copy the RTMP URL to your source device. Live Transcoder generates URLs for every network interface it has.
+
+When the stream key is set the button Start Detecting Input can be clicked to trigger an input stream detection and get video and audio parameters.
+
+The RTMP pipeline supports Auto reconfiguration, allowing for seamless updates to the video and audio input parameters during runtime. This feature ensures continuous processing of the live stream while accommodating changes to the configuration. It can be turned on by checking the Auto Reconfiguration check box and restarting the pipeline
+
+*Figure: CONFIGURING RTMP INPUT*
+
+## 5.1 RTMP(S) output
+
+RTMP(S) output in Live Transcoder supports both streams with authentication and without it. The protocol is used for video and audio streaming over the Internet and serves as a bridge between a Flash player and a server.
+
+We support the RTMP(S) output only in H.264 video codec and AAC audio codec. It is also worth mentioning that some services (e.g., YouTube) don’t accept RTMP(S) streams without any audio.
+
+Comprimato Live Transcoder is also mentioned as a Qualified Encoder by Akamai in a list that you can find here.
+
+## 5.2 Configuring RTMP(S) output
+
+To set up an RTMP(S) output stream, the first thing you need to do is to select Output stream options, Stream type as RTMP(S) and just beneath it, fill out the URL address (example of a URL of a stream with authentication: rtmp://user:pass@IPADDRESS/application/stream-key). If you have provided a valid URL, Live Transcoder will produce an output stream upon starting the configured pipeline using RTMP(S).
+
+*Figure: CONFIGURING RTMP(S)*
+
+If you want to use a hostname instead of an IP address in the URL, you need to set an appropriate DNS server and if it’s in the external network, the set Default route needs to have access to the Internet (both can be done in the Setup, more about that in the section 2.1).

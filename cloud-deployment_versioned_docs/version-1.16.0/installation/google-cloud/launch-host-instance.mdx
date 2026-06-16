@@ -1,0 +1,61 @@
+---
+title: Launch Host Instance
+sidebar_position: 2
+---
+
+This guide explains how to create a VM instance on Google Cloud Platform for running Live Transcoder.
+
+## 1. Instance Name and Region
+
+1. In the Console, navigate to **Compute Engine > VM Instances**.
+2. Click **Create Instance**.
+3. Enter an instance name and select your target region.
+
+## 2. Machine Configuration
+
+Select an appropriate machine type. A good starting point is **n1-standard-8** (8 vCPU, 30 GB memory).
+
+To add a GPU:
+1. In the **Machine configuration** section, click **Add GPU**.
+2. Select the GPU type and count. Availability varies by region.
+
+:::note
+Monitor your quotas — the instance creation page does not automatically validate your hardware selections against account limits.
+:::
+
+## 3. Operating System and Storage
+
+- **OS:** Ubuntu 24.04 LTS
+- **Boot disk size:** Minimum 128 GB for general use; **256 GB or more recommended** for HLS streaming workloads.
+
+Enable the **Delete boot disk when instance is deleted** option in advanced settings to avoid quota exhaustion from orphaned disks.
+
+## 4. Firewall Rules
+
+In the **Firewall** section:
+- Enable **Allow HTTP traffic** — required for the web UI and HLS streams.
+- Enable **Allow HTTPS traffic** — required only if your HLS sources use secured HTTP.
+
+After instance creation, configure additional firewall rules for NDI (ports 5353–7999) and RTMP (port 1935) via **VPC Network > Firewall**.
+
+## 5. Startup Script
+
+The guide provides an optional startup script that automatically installs:
+- Docker
+- Docker Compose
+- NVIDIA drivers (version 535)
+- NVIDIA Container Toolkit
+
+The script includes checks to skip installation if components are already present.
+
+:::warning
+**Wait a few minutes** after instance creation before connecting via SSH, to allow the startup script to complete all installations.
+:::
+
+## 6. Storage Considerations
+
+Journal log files can consume significant disk space on smaller instances. Monitor disk usage and consider increasing disk size or configuring log rotation.
+
+## Next Step
+
+Proceed to [Prepare Host OS](./prepare-host-os) to complete the configuration.

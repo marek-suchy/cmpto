@@ -1,0 +1,16 @@
+---
+title: Licensing problems
+hide_title: false
+---
+
+# Format of your license key is invalid
+
+![](/img/cloud-deployment/invalid-license-key.png)
+
+Your `docker-compose.yml` file doesn't contain a valid license key. First, ssh to the host instance and stop the Live Transcoder container using the `docker-compose stop` command.
+
+Next, edit the `docker-compose.yml` file and set the `TRC_LICENSE_KEY` variable to the correct license key obtained from the [Live Transcoder Dashboard](https://transcoder.comprimato.com/), i.e., replace the `<LICENSE_KEY>` placeholder.
+
+![](/img/cloud-deployment/docker-compose-license-key.png)
+
+Then, start the container again using the `docker-compose up -d`.

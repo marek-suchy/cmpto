@@ -1,0 +1,45 @@
+---
+title: HLS Storage Calculation
+sidebar_position: 1
+---
+
+When deploying Live Transcoder with HLS output enabled, you need to estimate the disk space required to store the HLS segments.
+
+## Calculation Overview
+
+Storage requirements depend on the following parameters, all of which are configurable in the Live Transcoder web UI:
+
+- **Output bitrate** — The total bitrate of the HLS stream(s)
+- **Segment duration** — Length of each HLS segment (in seconds)
+- **Number of segments retained** — How many segments are kept on disk at any time (the HLS playlist window)
+- **Number of output streams** — How many simultaneous HLS outputs are active
+
+## Formula
+
+```
+Storage (bytes) = Bitrate (bps) ÷ 8 × Segment Duration (s) × Number of Segments × Number of Streams
+```
+
+## Example
+
+For a single 5 Mbps HLS stream with 6-second segments and a 10-segment playlist window:
+
+```
+5,000,000 ÷ 8 × 6 × 10 = 37,500,000 bytes ≈ 36 MB
+```
+
+This is the steady-state storage footprint for that stream. Scale linearly for multiple output streams or bitrate ladders.
+
+## Configuration
+
+All bitrate and segment parameters are configurable through the **Live Transcoder web UI** in the pipeline output settings. Adjust these to match your storage constraints and delivery requirements.
+
+## Storage Recommendations
+
+| Use Case | Recommended Boot Disk |
+|---|---|
+| No HLS output | 100 GB |
+| HLS with short segments / small window | 128 GB |
+| HLS with multiple streams or long windows | 256 GB+ |
+
+For detailed guidance specific to your use case, contact [Comprimato Support](../advanced/contact-details).

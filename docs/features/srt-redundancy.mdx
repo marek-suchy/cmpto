@@ -1,0 +1,54 @@
+---
+title: SRT Redundancy
+hide_title: true
+hide_table_of_contents: true
+---
+
+import FeatureHeader from '@site/src/components/FeatureHeader'
+import YouTubeEmbed from '@site/src/components/YouTubeEmbed'
+import UISettings from '@site/src/components/UISettings'
+
+<FeatureHeader
+  title="SRT Redundancy"
+  products={['AJA Bridge Live', 'Comprimato Live Transcoder']}
+  useCases={['Remote production', 'Broadcast contribution', 'Live events', 'Sports production']}
+  keywords={['SRT', 'redundancy', 'failover', 'contribution', 'reliability', 'bonding', 'internet delivery']}
+  since="v1.0"
+/>
+
+<div className="feature-detail__section">
+
+SRT Redundancy enables simultaneous transmission of a live stream over two independent SRT paths, providing automatic failover protection against network degradation or path outages. If the primary connection drops below acceptable quality thresholds, the system seamlessly switches to the secondary path — with no visible disruption at the receiving end.
+
+The feature supports both Caller and Listener roles on each path independently, allowing flexible network topologies where firewalls or NAT traversal requirements differ per leg. Both paths carry identical encoded content, and the receiver-side SRT stack applies packet-level redundancy to reconstruct a clean stream even under partial packet loss.
+
+## Key capabilities
+
+Two simultaneous SRT output paths with independent host, port, and mode configuration (Caller/Listener). Configurable SRT latency per path to accommodate different RTTs. Automatic reconnection on path failure without operator intervention. Compatible with any SRT 1.4+ compliant receiver including FFmpeg, OBS, VLC, Haivision, and Zixi-based systems.
+
+## Broadcast engineering context
+
+In contribution workflows over unmanaged networks (internet, LTE/5G bonding, public cloud), a single SRT path can fail due to BGP reroutes, cellular handovers, or ISP problems. SRT Redundancy adds a second independent path (different ISP, different physical medium, or geographically diverse routing) so that at least one path remains functional at all times.
+
+The two paths do not need to have the same latency configuration. Path A might be tuned for a low-latency LTE connection while Path B uses a higher-latency DSL backup — the receiver's SRT stack handles the jitter difference transparently.
+
+## Use cases
+
+- **Remote production contribution** — dual-path SRT from venue to cloud production environment
+- **Sports events** — stadium to broadcast centre over bonded LTE + fixed internet
+- **News gathering** — ENG/REMI workflows with unreliable connectivity
+
+## Prerequisites
+
+- SRT 1.4+ on receiving end
+- Two independent network paths available at the encoder
+
+<UISettings>
+
+Navigate to **Settings → Destinations → SRT Output → Redundancy** and enable dual-path mode. Configure Path A and Path B independently — each path has its own host, port, Caller/Listener role, and SRT latency value. Both paths must be active before starting the stream.
+
+</UISettings>
+
+</div>
+
+<YouTubeEmbed url="https://www.youtube.com/watch?v=nvNTV0Rva0o" title="SRT Redundancy" />

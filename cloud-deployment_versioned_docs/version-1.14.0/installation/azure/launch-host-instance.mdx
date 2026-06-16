@@ -1,0 +1,53 @@
+---
+title: Launch Host Instance
+sidebar_position: 1
+---
+
+This guide explains how to deploy a Live Transcoder host instance on Microsoft Azure.
+
+## Recommended Instance Type
+
+The recommended VM size is **Standard_NC8as_T4_v3**, which provides:
+- 8 vCPUs
+- Single Nvidia Tesla T4 GPU
+
+:::note
+You'll need approximately **two vCPUs per 1080p H.264 4:2:0 8-bit stream**. Requirements vary significantly based on resolution and codec.
+:::
+
+## 1. Create the Virtual Machine
+
+1. In the Azure Portal, navigate to **Virtual Machines > Create**.
+2. Select your subscription and resource group.
+3. Choose your region.
+4. Under **Image**, select **Ubuntu Server 24.04 LTS - x64 Gen2**.
+5. Under **Size**, select `Standard_NC8as_T4_v3`.
+
+## 2. Authentication
+
+Use **SSH public key** authentication. Enter or generate a public key during VM creation. Password-based authentication is not recommended.
+
+## 3. Storage
+
+Allocate a minimum of **100 GiB** for the OS disk. Add additional data disks if you plan to use HLS outputs.
+
+:::warning
+A significant portion of free disk space is consumed by **systemd journal log messages**, which are essential for diagnostics and troubleshooting. Plan disk capacity accordingly.
+:::
+
+## 4. Network Access
+
+During VM creation, add inbound port rules for the following:
+
+| Port(s) | Protocol | Purpose |
+|---|---|---|
+| 22 | TCP | SSH |
+| 80 | TCP | HTTP (Web UI, HLS) |
+| 443 | TCP | HTTPS |
+| 1935 | TCP | RTMP input |
+| 5353–7999 | TCP/UDP | NDI |
+| Custom UDP range | UDP | MPEG-TS streams |
+
+## Next Step
+
+Proceed to [Prepare Host OS](./prepare-host-os) to configure the instance before running Live Transcoder.

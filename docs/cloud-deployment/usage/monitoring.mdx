@@ -1,0 +1,124 @@
+---
+title: Monitoring
+hide_title: false
+---
+
+Monitoring Dashboard is able to provide near real-time monitoring information about your pipelines across multiple instances of the Live Transcoder / Bridge Live.
+
+![](/img/cloud-deployment/image_1.png)
+
+## How to enable Monitoring
+
+### Enable monitoring for Docker deployments
+
+In the [docker-compose.yml](../run/run-docker-container#get-the-docker-composeyml) under the `environment` section, change this line
+
+```yaml
+# - TRC_monitoring_enabled=1
+```
+
+to
+
+```yaml
+- TRC_monitoring_enabled=1
+```
+
+:::note
+YAML files require correct indentation, so be sure to check that after you've changed the line, it is indented by two spaces from its parent section `environment`. You can look at other lines under the `environment` section to see if the indent of the changed line is correct.
+:::
+
+Then you can start the Live Transcoder Docker container with:
+
+```shell
+docker-compose up -d
+```
+
+### Enable monitoring for bare-metal Live Transcoder & Bridge Live installations
+
+Another alternative to enable monitoring is to edit the `settings.ini` in the Live Transcoder's Advanced setup, changing this line
+
+```
+;monitoring_enabled=1
+```
+
+to
+
+```
+monitoring_enabled=1
+```
+
+The environment variable `TRC_monitoring_enabled` takes precedence over the `monitoring_enabled` setting in the `settings.ini`.
+
+:::note The settings.ini method works also for the Docker deployment
+
+Please note that the `settings.ini` method works not only for the bare-metal installations but also for the Docker deployments. Docker users can therefore enable Monitoring either through the `docker-compose.yml` method or through `settings.ini`.
+
+Please consult the [Usage guide](./usage-guide) for information about `settings.ini`.
+:::
+
+Next, find the `monitoring_group_id` setting, remove the `;` at the start of the line and set the value to some unique value. It can be human-readable but it should contain a part that makes it unique, e.g. `live_transcoder_group_01_a4502e96`. After these changes, the line should look like this (with your chosen value in place of the example value).
+
+```
+monitoring_group_id=live_transcoder_group_01_a4502e96
+```
+
+:::warning
+Treat this value as a secret! Anyone can see your data on the Monitoring Dashboard if they know the value.
+:::
+
+Finally, upload and apply your updated .ini file to Transcoder and restart the service when asked. Next, check that monitoring is enabled.
+
+## Check the status of monitoring
+
+You can check the status of the Monitoring service in two places:
+
+1. On the Transcoder UI Dashboard in the *Services and devices status* panel
+
+![](/img/cloud-deployment/ui-dashboard-monitoring-status.png)
+
+2. On the Setup / System information page
+
+![](/img/cloud-deployment/ui-system-info-monitoring-status.png)
+
+Note that on Bridge Live devices the status is only shown when monitoring is explicitly enabled in settings.ini as the feature is not released for everyone.
+
+## Monitoring Dashboard
+
+The [Monitoring Dashboard](https://monitoring.comprimato.com) provides a visual overview of the pipelines tied to a specific Monitoring Group ID. If you have Live Transcoder running with monitoring enabled and currently existing pipelines, you will see the pipelines on the dashboard. Otherwise, you will see a text informing you that no pipelines are visible.
+
+![Monitoring Dashboard example](/img/cloud-deployment/image_1.png)
+
+*Monitoring Dashboard example*
+
+### Access the Monitoring Dashboard for Docker deployments
+
+1. Go to the [Licenses page on the Customer Dashboard](https://transcoder.comprimato.com/app/licenses).
+2. Identify the relevant license, and click on the Monitoring Dashboard icon (next to the status badge).
+
+![Monitoring Dashboard icon on the Live Transcoder Dashboard](/img/cloud-deployment/Screenshot_2023-07-19_at_16.44.34.png)
+
+*Monitoring Dashboard icon on the Customer Dashboard*
+
+### Access the Monitoring Dashboard for bare-metal Live Transcoder & Bridge Live installations
+
+After you've enabled monitoring in settings.ini, click on the Monitoring Dashboard link
+
+* on the Dashboard page in the *Services and devices status* panel
+
+![Screenshot from the Dashboard of the Transcoder UI](/img/cloud-deployment/ui-dashboard-services.png)
+
+*Screenshot from the Dashboard of the Transcoder UI*
+
+* or on the Setup / System Information page
+
+![Screenshot from the System Information page of the Transcoder UI](/img/cloud-deployment/ui-system-information-monitoring.png)
+
+*Screenshot from the System Information page of the Transcoder UI*
+
+### Monitoring Group ID
+
+To logically group multiple instances of Live Transcoder, a *Monitoring Group ID* is used. It can be created in three ways:
+
+* **Derived from the license key** - only for Docker deployments. You don't have to configure anything. You can see all pipelines from all Live Transcoders that use the same license key in one place. Monitoring Group ID derived from the license key looks similar to this: `a5bTD-5_cT0FGbJxbS6GA1opGCwtrxG5uMWdoApA-lU`.
+* **Custom ID, manually configured in the Advanced Setup** - you can set the Monitoring Group ID in the `settings.ini` by setting the `monitoring_group_id` setting. This might be useful if you want to monitor Live Transcoders, Live Transcoder on-prem installations or Bridge Live using multiple or no license keys. *Please use a unique value (UUID or similar) and treat it as a secret because anyone having access to it can see your data on the Monitoring Dashboard.*
+* **Temporary** - It's automatically generated when no derived or custom Monitoring Group ID is available. It's valid only for one run of the Transcoder service, meaning it's regenerated when the Transcoder service is restarted (or the Live Transcoder/Bridge Live machine reboots).

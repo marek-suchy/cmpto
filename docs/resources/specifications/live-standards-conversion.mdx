@@ -1,0 +1,125 @@
+---
+title: Live Standards Conversion — Specifications
+sidebar_label: Live Standards Conversion
+hide_title: true
+---
+
+# Live Standards Conversion
+
+<p className="resource-spec__meta">Cloud-native frame rate conversion and standards conversion for live IP workflows</p>
+
+## Video Input
+
+### Supported Codecs
+
+- JPEG 2000 TR-01
+- JPEG-XS TR-07
+- NDI (including NDI-HX)
+- H.264 (MPEG-4 AVC)
+- H.265 (HEVC)
+- MPEG-2
+- SMPTE 2110
+
+### Color Component Sampling
+
+- 4:2:2 10-bit / 8-bit
+- 4:2:0 10-bit / 8-bit
+
+## Audio Input
+
+| Codec | Notes |
+|---|---|
+| Uncompressed PCM – multichannel | SMPTE 302M-2007 |
+| AAC | ADTS / LATM |
+| AAC-HE | v1 & v2 |
+| MPEG-2 Audio | — |
+| AC-3 | — |
+| E-AC-3 | — |
+
+## Metadata
+
+- SCTE-35
+- Metadata pass-through
+- Subtitles embedding into H.264 SEI messages
+- Closed Captions (EIA-608/708)
+- SMPTE 2038
+- Timecode insertion into SEI messages for H.264 and H.265 (MISB 0604.6) — with SDI, NDI, and TS inputs
+
+## Containers & Protocols
+
+| Protocol / Container | Notes |
+|---|---|
+| UDP, RTP | — |
+| MPEG-2 TS, MPTS | — |
+| VSF TR-01 | — |
+| VSF TR-07 | — |
+| RTMP / RTMPS | — |
+| SRT | with Path Redundancy |
+| NDI | — |
+| HLS | — |
+| Hitless Merge | — |
+| Hitless Switch | — |
+
+## Synchronization
+
+| Parameter | Details |
+|---|---|
+| Input PCR | Configurable: global or local (contained in each input transport stream) |
+| Output PTS | Configurable: pass-through or offset addition |
+| Multi-pipeline sync | Using single PCR stream |
+
+## Video Processing
+
+Multiple output streams per input stream with different configurations available.
+
+- Resizing
+- Automatic color component subsampling
+- De-interlacing
+- Cropping / Padding
+- Color adjustments
+- Frame rate conversion (motion compensated)
+- Logo insertion
+
+## Audio Processing
+
+- Channel shuffling
+- Volume gain
+- Sampling rate conversion
+- Audio delay control
+
+## Video Output
+
+### Codecs
+
+- H.264 (MPEG-4 AVC)
+- NDI
+- JPEG 2000 TR-01
+- JPEG-XS TR-07
+- H.265 (HEVC)
+- MPEG-2
+- SMPTE 2110
+
+### Color Component Sampling
+
+- 4:2:2 10-bit / 8-bit
+- 4:2:0 10-bit / 8-bit
+
+## Audio Output
+
+| Codec | Notes |
+|---|---|
+| AAC | ADTS / LATM |
+| AAC-HE | v1 & v2 |
+| AC-3 | — |
+| Uncompressed PCM | SMPTE 302M-2007 |
+| MPEG-2 Audio | — |
+| Dolby-E | pass-through |
+
+## Configuration & Monitoring
+
+| Method | Details |
+|---|---|
+| Web UI | — |
+| REST API | — |
+| SNMP | — |
+| System webconsole | — |

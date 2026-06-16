@@ -1,0 +1,264 @@
+---
+title: ST 2110
+sidebar_label: ST 2110
+---
+
+# 9.0 ST 2110
+
+The Twenty-One Encoder supports SMPTE ST 2110 for both input and output, enabling the transport, synchronization, and description of separate elementary essence streams over IP networks
+
+## 9.1 SMPTE-2110 Input Specification
+
+The Twenty-One Encoder can ingest, produce, and convert SMPTE ST 2110 streams, adhering to the following specifications within the ST 2110 suite:
+
+**PTP (IEEE 1588-2008) **
+
+**2110-10 System Timing and Definitions **
+
+**2110-20 Uncompressed Active Video • 4:2:2 10bit only **
+
+**2110-30 PCM Digital Audio supporting C/CX conformance level**
+
+**NMOS IS-04, IS-05 **
+
+**Multicast (IGMPv3, SSM) **
+
+**2022-7 Seamless Protection Switching**
+
+## 9.2 Configuring PTP
+
+SMPTE-2110 needs system time to be precisely synchronized over the network. The PTP time synchronization protocol does this. Time is obtained from master clocks on the network. NTP is disabled to avoid clashes with PTP.
+
+In Twenty-one Encoder, PTP works only through the network interfaces with 25G SFP28 ports (usually named enp1s0f0np0 and enp1s0f1np1), not the 10G Ethernet ports.
+
+The network interface needs to be configured as Input/Output in UI / Setup to allow PTP through the firewall.
+
+*Figure: PTP FIREWALL CONFIGURATION*
+
+Currently, it's not possible to choose Grandmaster manually. Twenty-One Encoder regularly checks for Grandmaster on both SFP28 NICs, and selects it automatically using the Best master clock algorithm (BMCA).
+
+#### PTP Configuration
+
+To configure PTP, go to UI / Setup / PTP configuration page.
+
+**Statuses explained**
+
+You can check the state on UI / Setup / PTP configuration page, on UI / Setup / System information page and also at the Dashboard.
+
+*Figure: CORRECT PTP CONFIGURATION*
+
+*Figure: A PTP CONFIGURATION WITHOUT A GRANDMASTER*
+
+*Figure: AN ERRONEOUS PTP CONFIGURATION*
+
+**PTP Synchronization:**
+
+OK
+
+means synchronization is running and the Grandmaster is present
+
+PTP-wise, SMPTE-2110 is ready to be used
+
+Synchronization is running, but Grandmaster is not present
+
+All PTP synchronization services are running as configured, but we can't find any Grandmaster
+
+If it happens shortly after submitting PTP configuration, try refreshing the page after a few seconds.
+
+Double-check your configuration and try the Troubleshooting steps
+
+Error
+
+An internal error occurred. We'd like to hear about it to fix the problem. Please Go to UI / Setup / Diagnostics & Support and send us the Diagnostic package. Rebooting the device should fix the problem.
+
+It's possible that Grandmaster is present in this state but we don’t recommend using Twenty-one encoder in this state.
+
+**PTP Grandmaster:**
+
+Not present
+
+Time isn’t synchronized, so SMPTE-2110 streams won't work correctly
+
+24-8a-07-ff-fe-e9-09-80 on interface enp1s0f0np0 (192.168.20.159)
+
+24-8a-07-ff-fe-e9-09-80 - ID of the currently selected Grandmaster
+
+enp1s0f0np0 (192.168.20.159) - network interface name and its IP address on Twenty-one Encoder that leads to the currently selected Grandmaster
+
+**PTP Domain:**
+
+0-127
+
+Your currently configured domain number
+
+N/A (not available) means we can't show you the domain right now
+
+#### Configuration fields explained
+
+**PTP Domain:** A domain consists of one or more PTP devices communicating with each other as defined by the protocol. The domain is identified by an integer, the domain number, in the configurable range of 0 to 127. The default 2110 PTP domain is 127.
+
+**Announce Interval:** The mean time interval between Announce messages. A shorter interval makes PTP react faster to the changes in the master-slave hierarchy. The interval should be the same in the whole domain. It's specified as a power of two in seconds. The default is 0 (1 second).
+
+**Sync Interval:** The mean time interval between Sync messages. A shorter interval may improve the accuracy of the local clock. It's specified as a power of two in seconds. The default is -3 (125 milliseconds).
+
+**Announce Receipt Timeout:** The number of missed Announce messages before the last Announce message expires. The default value is 3.
+
+**Hybrid E2E:** When enabled, ports in the client state send their delay request messages to the unicast address taken from the server's announce message. Ports in the server state will reply to unicast delay requests using unicast delay responses. The default is disabled.
+
+#### Troubleshooting Guide
+
+Follow these steps to resolve PTP issues:
+
+Verify the configuration is correct
+
+Verify your domain number matches the PTP source device's domain number
+
+Check PTP Network Interface Card (NIC):
+
+Ensure it's running with a valid IP address on the UI / Setup / System Information page
+
+Ensure it’s configured as Input/Output in UI / Setup
+
+Ensure the PTP network uses the 25G SFP28 ports, not 10G Ethernet ports
+
+If Hybrid E2E is enabled, try disabling it, as your GM device may not support it.
+
+Reapply configuration
+
+Re-submit the current PTP configuration (submitting restarts PTP services)
+
+Reset to the default PTP configuration (hover with mouse over ⓘ to get default values)
+
+If all else fails, reboot the machine to restart all PTP-related services
+
+## 9.2 NMOS Support
+
+Twenty-One Encoder support the following NMOS standards:
+
+IS-04 Discovery and Registration – v1.2 and v1.3.
+
+IS-05 Device Connection Management – v1.0 and v1.1.
+
+All NMOS APIs are available on port 80.
+
+**Network Interface Configuration**
+
+By default, NMOS APIs are available on the eno1np0 network interface (labeled LAN 1 on the server backplate).
+
+To use a different network interface:
+
+Navigate to Setup to open the configuration wizard.
+
+In the Network Connectivity step, enable the Administration + NMOS checkbox of the desired network interface.
+
+You can enable NMOS on multiple network interfaces simultaneously if needed.
+
+**Configuring NMOS Discovery**
+
+ST 2110 streams are typically managed through a centralized NMOS Registry. Twenty-One Encoder supports multiple methods for discovering and connecting to your NMOS Registry service. The discovery is respecting the NMOS Interface Configuration described in the previous section.
+
+To configure NMOS Registry discovery:
+
+Navigate to Setup > NMOS Configuration in the UI
+
+Select one of the following discovery modes:
+
+Disabled – Completely disables NMOS Registry discovery
+
+Multicast – Discovers the registry via DNS Service Discovery on the local network via multicast.
+
+Unicast – Discovers the registry via DNS Service Discovery on a network specified by domain name.
+
+Static – Bypasses discovery and connects directly to the NMOS Registry using a manually specified Protocol, IP Address, Port, and API Version
+
+Figure 60: NMOS Discovery Configuration
+
+**NMOS Registry Status**
+
+You can view the current NMOS Registry connection status in two locations:
+
+Setup > NMOS Configuration
+
+Setup > System Information
+
+When successfully connected, the status displays the registry's IP Address, Port, and API Version (see Figure 61). If not connected, the status shows empty values (see Figure 62).
+
+Figure 61: NMOS Registered Status
+
+Figure 62: NMOS Not Registered Status
+
+## 9.3 Creating 2110 input pipeline
+
+In order to register the device in NMOS, ST 2110 input must be selected. Once selected the device will appear in NMOS registry after either “Start Detecting Input” or saving pipeline.
+
+Alternatively, if your NMOS software isn’t IS-04 compatible, then the NMOS API is available in REST API call: http://yourserver-IP:80/x-nmos
+
+The name of the device reflects the name of the pipeline, this can be edited by clicking edit name next to the pipeline name:
+
+*Figure: NMOS DEVICE NAME*
+
+## 9.4 Creating 2110 Output Configuration
+
+The output stream configuration allows you to specify the flow type, indicating whether the output is ST 2110-20 (audio) or ST 2110-30 (video).
+
+*Figure: 2110 FLOW TYPE*
+
+*Figure: 2110 DESTINATIONS*
+
+Primary RTP: Main stream destination.
+
+Redundant RTP: Backup stream destination for seamless protection switching, compliant with 2022-7. (Refer to the checkbox in the UI for this option.)
+
+Source IP: Dropdown menu to select the network SFP interface by its assigned IP address.
+
+Source Port: Field to specify the source port for output streaming.
+
+Destination IP: Can be configured for either unicast or multicast.
+
+Destination Port: Field to specify the destination port for transmitted packets.
+
+Both source and destination ports can be auto-assigned. The pipeline start will revert to the selected port configuration.
+
+*Figure: 2110 AUDIO CONFIGURATION*
+
+For audio configuration, at least one audio channel must be specified in the "Configure Audio Mapping" dialog. Additional configurations for standard Conformance Levels (A/AX, B/BX, C/CX) depend on the selected rate, packet interval, and audio bit depth.
+
+*Figure: 2110 VIDEO CONFIGURATION*
+
+The output frame size offers several options, including:
+
+UHD
+
+QHD
+
+FullHD
+
+HD
+
+SD PAL
+
+SD NTSC
+
+The encoder supports only 10-bit depth and 4:2:2 color sampling. All frame size options can be configured for either progressive or interlaced output.
+
+## 9.7 How to retrieve SDP file via the REST API
+
+To retrieve an SDP file for a specific receiver or sender, you first need to retrieve the ID of the pipeline which contains the receiver or sender. This is found in the pipeline JSON which can be downloaded from the UI as explained in section 2.1. The API call
+
+http://yourserver-IP:80/api/pipeline/`{id}`/state
+
+returns a JSON describing the pipeline state. Find the unique_id field - this is equivalent to the NMOS device_id.. Next, list all receivers or senders with
+
+http://yourserver-IP:80/x-nmos/node/v1.3/receivers
+
+or
+
+http://yourserver-IP:80/x-nmos/node/v1.3/senders
+
+From this list, find the id field of the receiver or sender you are interested in and which has a matching device_id. To distinguish video vs. audio receiver, use the label field. It has a value in the form of “`{pipeline_name}`/Video” or “`{pipeline_name}`/Audio#`{audio_index}`” e.g. “Pipeline/Audio#3”. You can also use the label field to identify a sender. Its label has the form of “`{pipeline_name}`/`{output_stream_name}`/Sender” e.g. “Pipeline/Output Stream #1/Sender”.
+
+Now that you have the id of the receiver or sender, you can use the following API calls:
+
+Receiver - http://yourserver-IP:80/x-nmos/connection/v1.1/single/receivers/`{receiver_id}`/activeSDP file is in the transport_file field of the JSON response.
+
+Sender - http://yourserver-IP:80/x-nmos/connection/v1.1/single/senders/`{sender_id}`/transportfileSDP file is the response body.

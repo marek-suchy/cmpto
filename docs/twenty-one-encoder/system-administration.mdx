@@ -1,0 +1,100 @@
+---
+title: Twenty-One Encoder System and Network Administration
+sidebar_label: Twenty-One Encoder System and Network Administration
+---
+
+# Twenty-One Encoder System and Network Administration
+
+## Console Administration
+
+It is highly recommended to boot the server with an already plugged-in monitor if you want to locally administrate the server. You can unplug the monitor later, but if you want to use it again, you should plug it back into the previously used port. If present, we also recommend disabling the internal GPU in BIOS and setting boot priority to the GPU used for the output (provided that more GPUs are being used).
+
+The default user environment is the web-based application. **However, for advanced administrative tasks, it is possible to switch to the system console**. The background OS is CentOS 7 where the standard shortcut Ctrl+Alt+F1 will forward you to the console environment, or alternatively Ctrl+Alt+T (used in the web application) forwards you to a graphical terminal application (it’s not meant for long-term use, only for a quick configuration or diagnostic). For Turing and Ampere-based GPUs (RTX series) it’s recommended to use the graphical terminal application, provided that you are using ports from that GPU.
+
+**Default accounts:**root user: rootpassword: transcodernon-root user: transcoderpassword: user-defined during installation
+
+**Note**: Due to security reasons, it is not possible to connect using SSH as a root user.
+
+**Twenty-one encoder files location:**Most of the important files are located in /opt/transcoder/ folder including the binaries or configuration files as well.
+
+**System services:**All Twenty-one encoder components run as a system service. You can use the standard OS’s interface systemctl to manage those services.
+
+transcoder-basestarts the transcoder and the webserver with web UI at the system start
+
+transcoder-xstarts graphical window system with lightweight desktop manager OpenBox
+
+transcoder-browserstarts Chromium browser in kiosk mode and restarts it in case it detects that Chromium stops running
+
+transcoder-license
+
+starts the license server with its web UI at the system start
+
+## Web Administration
+
+The security of the system is provided by a built-in firewall. The setup is available in UI’s setup wizard.
+
+Each network interface needs to be marked with an attribute whether its intent is to be used for:
+
+Administration – SSH, HTTP(S), SNMP and HLS protocols ports allowed
+
+Incoming/outgoing streams – 1024-65535 ports allowed
+
+Both
+
+Unused
+
+**All** **the remaining ports are blocked**.
+
+In a situation when an interface is marked either Administration or Unused it will not show in the stream configuration dialogue; therefore, it cannot be selected there.
+
+## Manual network interface configuration
+
+Twenty-one encoder UI offers only a limited possibility to configure network interfaces, and maybe you need to set it more precisely. In CentOS 7, there are two supported ways to configure network interfaces.
+
+**ifcfg files** – It uses ifcfg network configuration script files placed in ‘/etc/sysconfig/network-scripts’. It is used internally in Twenty-one encoder. You can manually adjust some parameters when needed. This is the preferred way of manual network setup in Twenty-one encoder OS.
+
+**ip command** – some changes made by the ip command are only temporal and are not guaranteed to survive system restart. Please do not use it besides testing.
+
+### Virtual interfaces
+
+Twenty-one encoder currently does not support creating new virtual interfaces in web UI. These interfaces need to be added using system console using ifcfg scripts. Currently, the Twenty-one encoder recognizes bond, bridge and vlan interfaces.
+
+### Adding a new virtual interface
+
+For example, to add vlan 100 to existing ethernet interface enp4s0:
+
+With sudo add a new file ifcfg-enp4s0.100 to directory /etc/sysconfig/network-scripts/ (for example with nano or vim)
+
+cd /etc/sysconfig/network-scripts/
+
+sudo vim ifcfg-enp4s0.100
+
+DEVICE=enp4s0.100
+
+TYPE=Vlan
+
+VLAN=yes
+
+VLAN_ID=100
+
+ONBOOT=yes
+
+BOOTPROTO=none
+
+NM_CONTROLLED=no
+
+IPV6INIT=no
+
+ZONE=trc-admin-data
+
+Next start the interface
+
+sudo ifdown ifcfg-enp4s0.100
+
+sudo ifup ifcfg-enp4s0.100
+
+Restart transcoder service
+
+sudo systemctl restart transcoder-base
+
+Wait until Twenty-one encoder starts and in Twenty-one encoder Dashboard run Setup where you can find your new vlan interface. Configure usage and complete setup.

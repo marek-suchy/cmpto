@@ -1,0 +1,16 @@
+---
+title: Input video must be specified before output stream can be defined
+hide_title: false
+---
+
+If the following warning is seen:
+
+![](/img/cloud-deployment/input-video-warning.png)
+
+This simply means the input video standard has been detected but has not been set, and therefore the pipeline cannot start:
+
+![](/img/cloud-deployment/input-video-set-standard.png)
+
+Clicking on the "Set as input" will update the input configuration to that of the detected video source.
+
+If you would like to leave the pipeline running but the input video changes, you can enable "Auto Reconfiguration". This will automatically update the input configuration every time the detected video source changes.

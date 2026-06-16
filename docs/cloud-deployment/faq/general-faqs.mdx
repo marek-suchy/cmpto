@@ -1,0 +1,85 @@
+---
+title: General FAQs
+hide_title: false
+---
+
+### What does the green/red circle in UI mean?
+
+This pictogram shows whether the input/output stream of a given pipeline is (green) or is not (red) working correctly. In case the stream is not functioning, an error message is displayed when you hover your mouse over the circle.
+
+### What is the performance of Comprimato Live Transcoder?
+
+Comprimato Live Transcoder is a software solution and is not strictly bound to a specific hardware appliance. The overall performance depends on the hardware configuration that is used in every set-up; even a conventional higher-class hardware can be used to run Comprimato Live Transcoder. Yet, for an optimal performance you can explore our datasheet where you can find exemplary configuration. [https://comprimato.com/wp-content/uploads/2023/10/Live\_Transcoder\_Datasheet\_2023.pdf](https://comprimato.com/wp-content/uploads/2023/10/Live_Transcoder_Datasheet_2023.pdf)
+
+### My GPU is at 100% utilization on the UI graph, why is this the case?
+
+The graph does not give an accurate utilization of the GPU usage currently. If frame drop alarm is present and other resources are under 70% but GPU is 100% it is likely GPU is overutilized.
+
+### I've lost the password to the UI, how can I reset this?
+
+### How can I change the password for UI administration?
+
+The default admin user password can be changed from the UI. User > Security
+
+### The date modified of the logs in the diagnostic package do not reflect the time in the log content, why is this?
+
+This is because the log files are stored in the filesystem with a UTC time. Your local machine will update the date modified/created due to which timezone it is set in. However the filename of each log will display the date and time due to which timezone is configured.
+
+### I want to license Live Transcoder however it cannot have internet access due to internal policies, what can I do?
+
+### Why does framerate conversion require so much CPU resource?
+
+Motion compensated framerate conversion is an intensive task performed by the CPU. For CPU recommendations for FRC please check here: [https://docs.transcoder.comprimato.com/docs/launch-host-instance#select-the-right-instance-size](https://docs.transcoder.comprimato.com/docs/launch-host-instance#select-the-right-instance-size)
+
+### I've lost my pipeline configuration, is there a way to retrieve this?
+
+Yes, your pipeline configuration is backed up. On the UI go to Setup > Diagnostics & Support > Create and download diagnostic report
+
+Within this tar archive the following directory will contain all previous pipeline configurations: `report\transcoder.tgz\transcoder\pipelines.json.backup`
+
+These json files can be uploaded to the Live Transcoder via the UI
+
+### What is Bridge 1 (docker0) under Ethernet Card?
+
+This is a virtual interface of the container and will need to be present for all docker deployments. Do not use this interface when configuring your pipelines.
+
+### How can I configure redundant input sources?
+
+Currently redundant paths are only offered when using SRT, this can be used in either broadcast or failover (work in progress) modes.
+
+### What is auto-reconfiguration and when should I enable it?
+
+Auto-reconfiguration feature allows detection of incoming video and transport and the ability to automatically adjust the pipeline input configuration if the input source changes. This could be used if the upstream source is going to be changed often but the user doesn't want to have to reconfigure and stop/start the pipeline often. This does not allow for seamless switching between input sources.
+
+### What are output destinations?
+
+Output destinations are multiple IP destinations per output per pipeline. This allows the Live Transcoder to unicast to multiple receivers and multicast as 2022-7 SIPs. For SRT we have dedicated redundancy modes and paths.
+
+### How do I contact customer support and what information is expected?
+
+1. Approximate or exact Date/Time in customers time zone of the issue encountered
+2. Which customer?
+3. Which product? i.e. Bridge Live, Live Transcoder?
+4. What happened and to which host (name or IP) and pipeline ID?
+5. Diagnostics package, please upload to [www.download.comprimato.com](http://www.download.comprimato.com) contact Comprimato Support for access
+6. Screengrab of the UI if possible or any messages seen
+
+### The UI shows that streams are working but I cannot receive any data on the output.
+
+It is highly probable that there is an issue on the network and the data are lost in transmission. Please verify that network route is accessible between devices (source, transcoder, receiver) including settings of firewall which may be configured to block Transcoder-related traffic (e.g. ports). You can use Wireshark to verify whether your target machine is receiving network data, or VLC to visualize the content.
+
+### I would like to submit a feature request, what should I do?
+
+Please contact our customer support to discuss your requirements [comprimato@support.com](mailto:comprimato@support.com)
+
+### I see frame drops in UI what can be the cause?
+
+There are two possible causes, i.e. flaws in the input or performance bottlenecks. The rule of thumb is to investigate whether drops occur when the machine is not fully utilized. If so, the problem may be in the input itself when some frames can be corrupted by losses during network transmission or compatibility issues. The other case is that high workload is responsible for frame drops, i.e. high utilization of HW resources (CPU, GPU, NI). Try to lower the performance drain by stopping some streams and observe the situation further.
+
+### How is the encoding/decoding work distributed between CPU and GPU?
+
+Our engineers pre-set an optimal load-balancing for each use-case and its hardware configuration. Nonetheless, it can be tampered with in settings file where there are parameters that specify decision rules that define which resolutions are encoded by CPU or GPU.
+
+### There are multiple fields where I can configure bitrate. What is the difference?
+
+There are 3 fields present - audio stream bitrate, video stream bitrate, transport stream (TS) bitrate. Audio and Video bitrate is denoted as "content bitrate"; higher bitrate means higher quality. TS bitrate needs to be higher than the sum of content bitrate because it deals with natural bitrate variance of content and ensures the stable overall bitrate. This TS bitrate overhead is filled with NULL packets that are discarded by receiver thus they have do not influence the resulting video produced (e.g. by OTT packager).

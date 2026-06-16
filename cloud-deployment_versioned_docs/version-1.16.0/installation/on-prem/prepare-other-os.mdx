@@ -1,0 +1,78 @@
+---
+title: Prepare Other OS
+sidebar_position: 3
+---
+
+This guide lists the prerequisites for running Live Transcoder on Linux distributions other than Ubuntu Server 24.04 LTS.
+
+## System Requirements
+
+### 1. Internet Connectivity
+
+The host instance must have internet access and functional DNS resolution. Live Transcoder needs to reach the Comprimato license servers.
+
+### 2. cgroups v1
+
+The OS must expose **cgroups v1**. Many modern systems default to cgroups v2 only.
+
+Verify with:
+
+```bash
+mount | grep '^cgroup' | awk '{print $1}' | uniq
+```
+
+If only `cgroup2` is listed, enable v1 by adding the following kernel parameter to your bootloader configuration:
+
+```
+systemd.unified_cgroup_hierarchy=0
+```
+
+### 3. Docker
+
+Version **20.0 or later** is required.
+
+### 4. NVIDIA Container Toolkit
+
+Version **1.17.7** is required.
+
+:::warning
+Versions **1.17.8–1.18.0** have known issues with GPU passthrough and must be avoided.
+:::
+
+### 5. Nvidia Driver
+
+Version **535 or later** is required.
+
+### 6. Docker Compose
+
+Command version **2.5 or later** is required.
+
+### 7. Firewall Ports
+
+Ensure the following ports are open:
+
+| Port(s) | Protocol | Purpose |
+|---|---|---|
+| 22 | TCP | SSH |
+| 80 | TCP | HTTP (Web UI, HLS) |
+| 443 | TCP | HTTPS |
+| 5353–7999 | TCP/UDP | NDI |
+| 1935 | TCP | RTMP input |
+| 1024–65535 | UDP | MPEG-TS over RTP/UDP/SRT |
+| IGMP | — | Multicast |
+
+### 8. mDNS and UDP Buffer Configuration
+
+- **Disable mDNS:** Remove or disable `avahi-daemon` to prevent NDI discovery conflicts.
+- **UDP kernel buffers:** Configure the OS for a maximum UDP receive and send buffer of **256 MB** (262144000 bytes):
+
+```bash
+net.core.rmem_max=262144000
+net.core.wmem_max=262144000
+```
+
+Add these to `/etc/sysctl.conf` and apply with `sudo sysctl -p`.
+
+## Next Step
+
+Once all prerequisites are met, proceed to [Run Docker Container](../../run/run-docker-container) to deploy Live Transcoder.

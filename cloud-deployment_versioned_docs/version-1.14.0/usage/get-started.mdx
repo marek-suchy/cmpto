@@ -1,0 +1,56 @@
+---
+title: Getting Started
+sidebar_position: 1
+---
+
+This guide walks you through the initial steps to access and configure Live Transcoder after deployment.
+
+## Prerequisites
+
+Before proceeding, ensure you have:
+
+1. Obtained a [subscription](../prerequisites/get-subscription)
+2. Installed Live Transcoder on your platform (AWS, Google Cloud, Oracle Cloud, Azure, or on-premises)
+3. [Deployed the Docker container](../run/run-docker-container)
+
+## Accessing the Web UI
+
+Open a web browser on your desktop and navigate to your host machine's public IP address:
+
+```
+http://<your-public-ip>
+```
+
+:::note
+The web UI is optimized for desktop browsers. Mobile browsers are supported but the desktop experience is recommended.
+:::
+
+## Logging In
+
+The default login credentials are:
+
+- **Username:** `admin`
+- **Password:** `admin`
+
+:::warning
+Change your password immediately after the first login. Navigate to **Admin > Security** to update your credentials.
+:::
+
+## HTTPS Access
+
+For deployments accessible from the public internet, enabling HTTPS is strongly recommended.
+
+When accessing via HTTPS for the first time, your browser may display a certificate warning for the self-signed certificate. This is expected — you can safely bypass the warning to continue.
+
+## Initial Configuration
+
+After logging in:
+
+1. Navigate to **Admin > Security** to change the default password.
+2. Explore the dashboard to view hardware utilization (CPU, GPU, RAM, network).
+3. Begin testing streams to evaluate whether your instance type meets your performance needs.
+
+## Next Steps
+
+- Read the [API Reference](./api-reference) to integrate with Live Transcoder programmatically.
+- Learn [how to upgrade](./how-to-upgrade) to new versions.

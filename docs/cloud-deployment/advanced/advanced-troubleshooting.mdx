@@ -1,0 +1,49 @@
+---
+title: Advanced Troubleshooting
+hide_title: false
+---
+
+## Licensing Issues
+
+If there is a feature configured within a pipeline that does not match the license type, the following warning will appear in the UI. Contact Comprimato Support to request a license upgrade if the feature is required.
+
+![](/img/cloud-deployment/license-feature-warning.png)
+
+Live Transcoder requires public internet connectivity to reach the Comprimato license servers:
+
+- [https://ls.transcoder.comprimato.com](https://ls.transcoder.comprimato.com)
+- [https://ls2.transcoder.comprimato.com](https://ls2.transcoder.comprimato.com)
+
+If there is no connection with the license server, a warning will appear in the UI.
+
+Please ensure there is adequate network connectivity to the license servers above. You can use reverse DNS lookup to check for public IP addresses and `netstat` to check for current established sessions on the host.
+
+## Explanation of UI Hardware Resource Monitoring
+
+The resource and monitoring page shows the following resources:
+
+1. **System RAM / GPU memory** — Scalable graph. To see the total available, hover the mouse over the current max usage line.
+2. **CPU / GPU usage** — See the [CPU-GPU multimedia processing table](./cpu-gpu-processing-table) for which pipeline options use which resource.
+   - Recommendation: both CPU and NVENC/NVDEC utilization should not spike above **75%**.
+3. **Network utilization** — Scalable graph; increases scale with higher bandwidth.
+
+:::note
+100% on the GPU usage graph does not represent true 100% usage of the Nvidia GPU.
+:::
+
+Under **Services and Devices** status you can see the current status of built-in Live Transcoder ancillary services:
+
+- **REST API** — Enabled by default. The Live Transcoder API documentation is available on the instance under the API button.
+- **SNMP agent** — Disabled by default. See the [Usage Guide](../usage/usage-guide) to enable and configure.
+- **SSH daemon** — Disabled by default on Live Transcoder, as other SSH services are typically installed on the host by the cloud provider or hardware owner.
+- **License server connection** — If stopped or disabled, refer to the licensing section above.
+- **Monitoring Service** — See [Monitoring](../usage/monitoring) for setup instructions.
+
+## Mandatory Information When Reporting an Issue to Comprimato Support
+
+1. Approximate or exact date/time in the customer's time zone of the issue encountered
+2. Which customer?
+3. Which product? (e.g. Live Transcoder, Twenty-One Encoder)
+4. What happened and to which host (name or IP) and pipeline ID?
+5. Diagnostics package — upload to [www.download.comprimato.com](http://www.download.comprimato.com) (contact Comprimato Support for access)
+6. Screengrab of the UI if possible, or any messages seen

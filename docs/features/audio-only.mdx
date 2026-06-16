@@ -1,0 +1,46 @@
+---
+title: Audio Only
+hide_title: true
+hide_table_of_contents: true
+---
+
+import FeatureHeader from '@site/src/components/FeatureHeader'
+import YouTubeEmbed from '@site/src/components/YouTubeEmbed'
+import UISettings from '@site/src/components/UISettings'
+
+<FeatureHeader
+  title="Audio Only"
+  products={['AJA Bridge Live', 'Comprimato Live Transcoder']}
+  useCases={['Remote production', 'Broadcast contribution', 'Distribution']}
+  keywords={['audio', 'radio', 'bandwidth', 'commentary', 'contribution', 'audio-only', 'efficiency']}
+  since="v1.0"
+/>
+
+<div className="feature-detail__section">
+
+Audio Only mode allows the encoder to transmit compressed audio without any video payload. This dramatically reduces bandwidth consumption and processing load, making it ideal for commentary feeds, radio contribution, intercom extensions, and any workflow where video is unnecessary or unavailable.
+
+## Key capabilities
+
+Encode and stream up to 8 channels of audio (AAC-LC or AAC-HE) without a video track. Configurable bitrate per channel. Compatible with all supported transport protocols (SRT, RTMP, MPEG-TS). Minimal CPU/GPU overhead compared to full A/V pipelines.
+
+## Broadcast engineering context
+
+In large live productions, commentary and intercom feeds often need to travel the same IP paths as video contribution but without the associated bandwidth cost. Audio Only mode allows the same encoder hardware to serve both video and audio-only destinations simultaneously, reducing the infrastructure footprint for multi-site productions.
+
+## Use cases
+
+- **Commentary feeds** — send audio-only commentary from venue to MCR
+- **Radio contribution** — broadcast-quality audio over IP with no video overhead
+- **Backup audio** — maintain audio continuity during video source failures
+- **Intercom extension** — low-latency audio path between sites
+
+<UISettings>
+
+Navigate to **Settings → Encoder → Output → Mode** and select **Audio Only**. Configure the number of audio channels (1–8), codec (AAC-LC or AAC-HE), and per-channel bitrate. All configured output destinations will carry audio tracks only — no video payload is transmitted.
+
+</UISettings>
+
+</div>
+
+<YouTubeEmbed url="https://www.youtube.com/watch?v=nvNTV0Rva0o" title="Audio Only" />

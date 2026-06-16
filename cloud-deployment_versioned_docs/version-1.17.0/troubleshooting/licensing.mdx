@@ -1,0 +1,51 @@
+---
+title: License Problems
+sidebar_position: 4
+---
+
+## Error: Invalid License Key Format
+
+If you see an **"invalid license key format"** error in the Live Transcoder web UI or logs, it means the `docker-compose.yml` file contains an incorrect or placeholder license key.
+
+## Resolution
+
+### 1. Stop the Container
+
+Connect to your host instance via SSH and stop the running container:
+
+```bash
+docker-compose stop
+```
+
+### 2. Update the License Key
+
+Open the `docker-compose.yml` file and update the `TRC_LICENSE_KEY` environment variable with your valid license key:
+
+```bash
+nano docker-compose.yml
+```
+
+Find and update:
+
+```yaml
+    environment:
+      - TRC_LICENSE_KEY=<LICENSE_KEY>    # Replace with your actual key
+```
+
+Replace `<LICENSE_KEY>` with the UUID-format key from your [Live Transcoder Dashboard](https://transcoder.comprimato.com).
+
+### 3. Restart the Container
+
+```bash
+docker-compose up -d
+```
+
+## Obtaining Your License Key
+
+Your license key is available on the [Live Transcoder Customer Dashboard](https://transcoder.comprimato.com). It is in UUID format, for example:
+
+```
+64544bd5-8df6-490c-bce7-468d035a8b1a
+```
+
+If you do not have dashboard access, contact [Comprimato Support](../advanced/contact-details).

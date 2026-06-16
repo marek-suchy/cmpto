@@ -1,0 +1,42 @@
+---
+title: I Can't See My HLS Output
+sidebar_position: 3
+---
+
+If HLS output streams are not accessible, check the following common causes.
+
+## 1. Firewall Rules
+
+Ensure ports **80** and **443** are open to the IP addresses of your consumer devices.
+
+- **On-premises:** Check the host OS firewall (`ufw`, `firewalld`, etc.).
+- **Cloud providers:** Verify that the security group / network security group allows inbound TCP on ports 80 and 443.
+
+## 2. Public vs. Private IP Address
+
+This is the most common source of confusion in cloud deployments.
+
+The Live Transcoder web UI displays HLS playlist URLs based on **all detected network interfaces**, which typically shows private IP addresses assigned by the cloud provider. The public IP is not automatically visible to the system.
+
+You must construct the HLS URL manually using the **public IP address** of your instance.
+
+### Example
+
+If your instance has:
+- Private IP: `10.0.1.45` (shown in the UI)
+- Public IP: `34.242.253.227` (from your cloud provider)
+
+The correct HLS URL to use externally is:
+
+```
+http://34.242.253.227/hls/test.m3u8
+```
+
+Not the URL shown in the UI, which will use the private IP.
+
+### Finding Your Public IP
+
+- **AWS:** Check the EC2 instance details for the **Public IPv4 address** (or use the Elastic IP if assigned).
+- **GCP:** Check the VM instance details for the **External IP**.
+- **Azure:** Check the VM's **Public IP address** resource.
+- **OCI:** Check the instance's **Public IP address** in the networking section.

@@ -1,0 +1,42 @@
+---
+title: Timestamp SEI support (MISB ST 0604.6)
+sidebar_label: Timestamp SEI support (MISB ST 0604.6)
+---
+
+# 8.0 Timestamp SEI support (MISB ST 0604.6)
+
+Live Transcoder supports timestamps SEI messages according to the MISB ST 0604.6 standard. Timestamp values are obtained from the local time of the machine Live Transcoder runs at and they are inserted as SEI into the output stream. The time of the machine is supposed to be synchronized using the NTP.
+
+The timestamps SEI messages are supported for the following inputs:
+
+MPEG-TS
+
+NDI
+
+and can be inserted into H.264 or H.265 video outputs.
+
+By default, the insertion of timestamps SEI into the output streams is turned off. To turn it on the following settings.ini variables can be used:
+
+; timestamp SEI messages (MISB 0604)
+
+; --------------------------------------------------------------
+
+; enable/disable adding timecode SEI messages for H.264 nvenc (default: disabled)
+
+; NVENC_H264_ADD_TIMESTAMPS = 1
+
+; enable/disable adding timecode SEI messages for H.264 cpu encoder (default: disabled)
+
+; X264_ADD_TIMESTAMPS = 1
+
+; enable/disable adding timecode SEI messages for H.265 nvenc (default: disabled)
+
+; NVENC_HEVC_ADD_TIMESTAMPS = 1
+
+Moreover, a custom timestamp identifier can be provided for the H.265 streams. If this setting is omitted (default) the standard identifier specified by the MISB ST 0604.6 is used.
+
+; timestamp identifier to be used as the uuid_iso_iec_11578 of the user data SEI message
+
+; ommit to use the standard one specified in MISB ST 0604 (works for H.265 nvenc only!)
+
+; NVENC_HEVC_TIMESTAMPS_IDENTIFIER = cf848278-ee23-306c-9265-e8fef22fb8b8

@@ -1,0 +1,50 @@
+---
+title: AV Delay
+hide_title: true
+hide_table_of_contents: true
+---
+
+import FeatureHeader from '@site/src/components/FeatureHeader'
+import YouTubeEmbed from '@site/src/components/YouTubeEmbed'
+import UISettings from '@site/src/components/UISettings'
+
+<FeatureHeader
+  title="AV Delay"
+  products={['AJA Bridge Live', 'Comprimato Live Transcoder']}
+  useCases={['Remote production', 'On-prem production', 'Broadcast contribution', 'Live events']}
+  keywords={['A/V sync', 'lip-sync', 'delay compensation', 'audio alignment', 'timing', 'synchronization']}
+  since="v1.0"
+/>
+
+<div className="feature-detail__section">
+
+AV Delay allows operators to introduce a configurable delay to either the audio or video path independently, compensating for timing mismatches that arise from different processing latencies in the signal chain. This ensures lip-sync accuracy across the entire production workflow.
+
+## Key capabilities
+
+Independent delay adjustment for audio and video paths. Millisecond-precision control. Applied in real time without stream interruption. Compensates for upstream processing latency differences between audio and video hardware.
+
+## Broadcast engineering context
+
+In professional broadcast chains, audio and video often travel through different processing stages — SDI embedders, frame synchronisers, hardware decoders, or software codecs — each introducing different amounts of latency. Without compensation, the encoded stream may arrive with a persistent lip-sync error. AV Delay corrects this at the encoder before the stream leaves the facility.
+
+Typical sources of misalignment:
+- Audio processing hardware with lower latency than video scalers
+- Frame synchronisers introducing variable video delay
+- Software decode paths with inconsistent processing times
+
+## Use cases
+
+- **Live events** — correct lip-sync before contribution to broadcast centre
+- **Remote production** — compensate for SDI-to-IP conversion timing differences
+- **On-prem studio** — align audio from console with video from camera chain
+
+<UISettings>
+
+Navigate to **Settings → Encoder → Input → AV Delay**. Available on all input types. Set a positive audio delay to postpone the audio relative to video, or a negative value to do the opposite. Both audio and video delay can be set independently in milliseconds.
+
+</UISettings>
+
+</div>
+
+<YouTubeEmbed url="https://www.youtube.com/watch?v=nvNTV0Rva0o" title="AV Delay" />

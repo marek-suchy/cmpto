@@ -1,0 +1,32 @@
+---
+title: Using REST API
+sidebar_label: Using REST API
+---
+
+# Using REST API
+
+Comprimato Twenty-One Encoder** is REST API ready**. You can access the complete API documentation from the top right-hand side corner in UI using the API button. Here we list some curl commands:
+
+list network interfaces
+
+```bash
+curl 'http://localhost:8080/api/system/network-interfaces' -i -H 'Accept: application/json'
+```
+
+list all available pipelines
+
+```bash
+curl 'http://localhost:8080/api/pipelines' -i -H 'Accept: application/json'
+```
+
+add simple pipeline with input stream data
+
+```bash
+curl 'http://localhost:8080/api/pipeline' -i -X POST -H 'Content-Type: application/json' \-d '{ "name" : "Pipeline 3", "source" : "udp://127.0.0.1:5000:lo", "complianceWith" : "TR_01", "video" : {   "format" : "J2K",   "width" : 1920,   "height" : 1080,   "sampling" : "4:2:2",   "depth" : 10,   "framerate" : "24",   "fieldOrder" : "PROGRESSIVE" }}
+```
+
+get the state of pipeline with ID 0
+
+```bash
+curl 'http://localhost:8080/api/pipeline/0/state' -i -H 'Accept: application/json'
+```

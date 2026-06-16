@@ -1,0 +1,25 @@
+---
+title: "Error: Some video frames are being dropped"
+hide_title: false
+---
+
+If you encounter the following errors, it means video frames are being dropped:
+
+![](/img/cloud-deployment/frame-dropping-error.png)
+
+Please check the hardware utilization by clicking on the top left "Live Transcoder":
+
+![](/img/cloud-deployment/frame-dropping-hw-utilization.png)
+
+The hardware utilization page will tell you if a larger instance is required to host your pipeline configuration(s):
+
+![](/img/cloud-deployment/hw-utilization-graph.png)
+
+Looking at the graphs the following questions will help you decide whether more hardware resource is needed:
+
+* Is there more than 1x pipeline configured? Does stopping a pipeline resolve the error? If the answer is yes, there is not enough hardware resource available.
+* Is there too much GPU memory utilization? The graph will display GPU memory in blue. Total available GPU memory is displayed on the system information webpage as "Main Memory"
+* Network interface utilization is over saturated? check network interface bandwidth, is it 1gbps, 10gbps? Please keep in mind the graph will scale up to the highest bandwidth used.
+* Is the CPU utilization spiking over 70% within the graph? We recommend 70% is the upper limit for CPU spikes when the pipelines are active.
+* GPU utilization can safely scale over 100%, however if all other resources look under-utilized but GPU is 100%, we recommend to try a higher performance GPU with the same pipeline configuration and see if the error ceases.
+* Is there an error within the stream statistics? The FPS drop counter will help distinguish which part of the pipeline configuration is having the issue. i.e., input, output, sink1, sink2, etc...

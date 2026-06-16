@@ -1,0 +1,172 @@
+---
+title: Using the SNMP protocol
+sidebar_label: Using the SNMP protocol
+---
+
+# Using the SNMP protocol
+
+## Enable SNMP
+
+### Enable SNMP services
+
+SNMP services make SNMP available on the network. They are disabled by default in the Twenty-one encoder OS for security reasons as it’s not recommended to enable SNMP on public networks. To enable SNMP services, use ssh or terminal:
+
+Start SNMP services on every system boot:
+
+sudo systemctl enable snmpdsudo systemctl enable snmptrapd
+
+Start SNMP services now:
+
+sudo systemctl start snmpdsudo systemctl start snmptrapd
+
+Check the status of SNMP services:
+
+systemctl status snmpdsystemctl status snmptrapd
+
+### Enable Twenty-one encoder SNMP agent
+
+Twenty-One Encoder can add additional information about its pipelines, dropped frames, etc. into the default SNMP tree using its SNMP agent.
+
+SNMP agent is disabled by default in the Twenty-One Encoder. If you want to enable it, set the snmp_enable entry to 1 in the Advanced setup.
+
+Example:
+
+snmp_enable=1
+
+To modify this setting, use the steps described at the beginning of chapter **5.5.1** **Advanced setup.**
+
+## Example of SNMP commands
+
+It is possible to automate the system monitoring with SNMP protocol. Below is the list of commands that you may use:
+
+**Note:** The monitoring only works while the Twenty-one encoder is actually transcoding, i.e., you will not see a correct response if the system is idle.
+
+CPU utilization
+
+snmpwalk -v2c -cpublic `<IP>` .1.3.6.1.4.1.2021.11.9
+
+GPU utilization
+
+snmpwalk -v2c -cpublic `<IP>` .1.3.6.1.4.1.50087.1.1.4.1.3
+
+Available GPUs
+
+snmpwalk -v2c -cpublic `<IP>` .1.3.6.1.4.1.50087.1.1.4.1.2
+
+Inbound streams
+
+snmpwalk -v2c -cpublic `<IP>` .1.3.6.1.4.1.50087.1.2.2.1
+
+Outbound streams
+
+snmpwalk -v2c -cpublic `<IP>` .1.3.6.1.4.1.50087.1.2.3.1
+
+Dropped frames
+
+snmpwalk -v2c -cpublic `<IP>` .1.3.6.1.4.1.50087.1.2.3.1.8
+
+Overall status
+
+snmpwalk -v2c -cpublic `<IP>` .1.3.6.1.4.1.50087.1.1.3.1
+
+Network received data
+
+snmpwalk -v2c -cpublic `<IP>` .1.3.6.1.2.1.2.2.1.10
+
+Network transmitted data
+
+snmpwalk -v2c -cpublic `<IP>` .1.3.6.1.2.1.2.2.1.16
+
+Network interfaces
+
+snmpwalk -v2c -cpublic `<IP>` .1.3.6.1.2.1.2.2.1.2
+
+Obtaining the name of an object in a tree – outputs COMPRIMATO-SYSTEMS-MIB:cmpto
+
+snmptranslate .1.3.6.1.4.1.50087
+
+Obtaining the location of a certain object from MIB – outputs .1.3.6.1.4.1.50087.1.1.3
+
+snmptranslate –On COMPRIMATO-SYSTEMS-MIB:trcOutputStreamTable
+
+## SNMP traps
+
+In Twenty-one encoder, we use standard SNMP traps. SNMP traps are used to send event messages. An event has a start and an end which are conveyed by event messages. Below is an example of events we use:
+
+user launched a pipeline,
+
+user stopped a pipeline,
+
+a pipeline crashed,
+
+the Twenty-one encoder is receiving no input,
+
+the Twenty-one encoder is producing no output,
+
+some frames are being dropped by the Twenty-one encoder,
+
+invalid data on input.
+
+Each event has assigned a severity, which can be:
+
+info(0),
+
+warning(1),
+
+error(2),
+
+clear(3).
+
+Events get cleared by a trap containing an event message with severity clear(3). Event messages regarding the same event are linked together by the same trcEventKey.
+
+trcEvent structure:
+
+trcEventIndex,
+
+trcEventKey,
+
+trcEventObject,
+
+trcEventObjectName,
+
+trcEventSeverity,
+
+trcEventText,
+
+trcEventCreatedTime.
+
+The event message contains all the necessary information about the event:
+
+eventObject – OID of the alarming object within the node having the alarm,
+
+eventObjectName – the human-friendly name of the alarming object,
+
+severity – the severity of the event (CLEAR - add),
+
+text – an event text providing more information about the issue,
+
+createTime – the time when the event was raised/cleared.
+
+There are also two related tables – lastEventsTable and activeEventsTable. lastEventsTable contains 10 most recent event messages (one row for each sent trap) and activeEventsTable contains all raised events which have not been cleared yet, alongside with four most recently cleared ones.
+
+OIDs of relevant tables:
+
+lastEventsTable .1.3.6.1.4.1.50087.1.1.2.1,
+
+activeEventsTable .1.3.6.1.4.1.50087.1.1.3.1.
+
+## Configuration of SNMP manager
+
+You can find the MIB file in Twenty-one encoder here: /usr/share/snmp/mibs/COMPRIMATO-SYSTEMS-MIB.txt.
+
+Setup to configure the SNMP agent:
+
+open “/etc/snmp/snmpd.conf” for editing as sudo,
+
+find the line that reads “trap2sink localhost public”,
+
+replace “localhost” with the IP address of the SNMP manager. The line should then look like this: “trap2sink 172.12.5.123 public”,
+
+save the file,
+
+restart SNMP services: “sudo systemctl restart snmpd” and “sudo systemctl restart snmptrapd”.

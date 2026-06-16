@@ -1,0 +1,20 @@
+---
+title: I can't see my HLS output
+hide_title: false
+---
+
+# Firewall problems
+
+Are ports 80 and 443 open to the IP addresses of your consumer device?
+
+# Public vs. private IP address
+
+Transcoder UI shows HLS playlist URLs for all network interfaces on the instance.
+
+![](/img/cloud-deployment/ui-hls-output.png)
+
+However, the public IP address provided by the cloud provider is invisible to it.
+
+![](/img/cloud-deployment/aws-instance-details.png)
+
+In this case, the public URL of the HLS stream is `http://34.242.253.227/hls/test.m3u8`

@@ -1,0 +1,27 @@
+---
+title: I can't see NDI sources
+hide_title: false
+---
+
+This may be caused by several problems.
+
+# mDNS conflicts
+
+NDI uses the mDNS (Avahi daemon on Linux) to discover NDI sources. Live Transcoder in Docker already has avahi-daemon up, and another avahi-daemon on your host system can lead to a conflict. Stopping the service on your host system solves the issue. You can stop it with this command.
+
+```shell
+sudo systemctl stop avahi-daemon
+```
+
+This command prevents the startup of the daemon at boot.
+
+```shell
+sudo systemctl disable avahi-daemon
+```
+
+Stop and start your Live Transcoder container again.
+
+# Cloud-specific problems
+
+* The Live Transcoder host instance is in a different VPC or subnet than your NDI source.
+* Ports needed for NDI source discovery are closed in your cloud provider's firewall (Security Groups in AWS)

@@ -1,0 +1,70 @@
+---
+title: Diagnostics Package (Logs)
+sidebar_position: 4
+---
+
+The diagnostics package is the primary tool for troubleshooting Live Transcoder issues. It collects system, hardware, network, and pipeline log data into a single downloadable archive.
+
+## Downloading the Diagnostics Package
+
+1. Log in to the Live Transcoder web UI.
+2. Navigate to **Setup > Diagnostics & Support**.
+3. Click the download button to generate and download the package.
+
+The system retains logs for **7 days**.
+
+## Package Contents
+
+| Item | Description |
+|---|---|
+| Version information | System details and codebase versions |
+| Hardware data | Full hardware specifications |
+| Network configuration | Host network interface settings |
+| Pipeline logs | Last 24 hours of activity for all active services |
+| Configuration files | Current and previous pipeline configurations |
+
+## Log Configuration
+
+### File Logging
+
+Log files rotate every **60 minutes**. The default maximum disk usage for logs is **10 GB**, configurable via the `TRC_DISK_LOG_LIMIT_MEGABYTES` environment variable in `docker-compose.yml`.
+
+### Console Logging
+
+Console output is merged into the systemd Journald service and stored at `/var/log/journal`.
+
+### Verbosity Levels
+
+| Level | Description |
+|---|---|
+| 0 | No logging |
+| 1 | Errors only |
+| 2 | Warnings and errors |
+| 3 | Informational (recommended for customers) |
+| 4 | Debug |
+| 5 | Developer level 2 (maximum verbosity) |
+
+Level 3 is recommended as it balances diagnostic detail against disk usage.
+
+## Log Component Mapping
+
+Log files are named after pipeline components. The naming convention is:
+
+```
+<Component>_<PipelineID>_<SourceID>
+```
+
+Examples:
+
+| Log File | What It Tracks |
+|---|---|
+| `Demux_0_0` | Input demux for Pipeline 0, Source 0 |
+| `TsMux_0_0` | Output mux for Pipeline 0, Output 0 |
+
+## Common Log Errors
+
+| Error Pattern | Likely Cause |
+|---|---|
+| MPEG-TS continuity errors | Packet loss or corruption on input |
+| SRT connection failures | Network misconfiguration or firewall blocking the SRT port |
+| NDI stream problems | mDNS conflict or network isolation (see [NDI Sources](../troubleshooting/ndi-sources)) |
