@@ -2,7 +2,7 @@ import React from 'react'
 
 function getEmbedUrl(url: string): string | null {
   const match = url.match(/(?:v=|youtu\.be\/|embed\/)([A-Za-z0-9_-]{11})/)
-  return match ? `https://www.youtube.com/embed/${match[1]}` : null
+  return match ? `https://www.youtube-nocookie.com/embed/${match[1]}` : null
 }
 
 interface Props {
@@ -10,7 +10,7 @@ interface Props {
   title?: string
 }
 
-export default function YouTubeEmbed({ url, title = 'Video' }: Props): JSX.Element | null {
+export default function YouTubeEmbed({ url, title = 'Video' }: Props): React.JSX.Element | null {
   const embedUrl = getEmbedUrl(url)
   if (!embedUrl) return null
 
@@ -21,6 +21,7 @@ export default function YouTubeEmbed({ url, title = 'Video' }: Props): JSX.Eleme
         <iframe
           src={embedUrl}
           title={title}
+          loading="lazy"
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
           allowFullScreen
         />

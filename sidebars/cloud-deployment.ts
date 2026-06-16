@@ -4,13 +4,13 @@ const sidebars: SidebarsConfig = {
   cloudDeploymentSidebar: [
     {
       type: 'doc',
-      id: 'changelog',
-      label: 'Changelog',
+      id: 'index',
+      label: 'Overview',
     },
     {
       type: 'doc',
-      id: 'index',
-      label: 'Overview',
+      id: 'changelog',
+      label: 'Changelog',
     },
     {
       type: 'doc',

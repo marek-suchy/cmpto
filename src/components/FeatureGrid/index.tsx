@@ -3,11 +3,7 @@ import Link from '@docusaurus/Link'
 import { ArrowRight } from 'lucide-react'
 import { features, PRODUCTS, USE_CASES, type Feature } from '@site/src/data/features'
 
-function normalize(s: string) {
-  return s.toLowerCase()
-}
-
-export default function FeatureGrid(): JSX.Element {
+export default function FeatureGrid(): React.JSX.Element {
   const [selectedProduct, setSelectedProduct] = useState<string | null>(null)
   const [selectedUseCase, setSelectedUseCase] = useState<string | null>(null)
 
@@ -69,7 +65,7 @@ export default function FeatureGrid(): JSX.Element {
   )
 }
 
-function FeatureCard({ feature: f }: { feature: Feature }): JSX.Element {
+function FeatureCard({ feature: f }: { feature: Feature }): React.JSX.Element {
   return (
     <Link href={`/features/${f.id}`} className="feature-card">
       <div className="feature-card__header">

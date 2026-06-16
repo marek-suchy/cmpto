@@ -16,7 +16,7 @@ export default function FeatureHeader({
   useCases = [],
   keywords = [],
   since,
-}: Props): JSX.Element {
+}: Props): React.JSX.Element {
   return (
     <>
       {/* Top bar — back link + print/PDF — hidden on print */}

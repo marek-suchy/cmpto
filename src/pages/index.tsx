@@ -34,7 +34,7 @@ const SECTIONS = [
   },
 ]
 
-export default function Dashboard(): JSX.Element {
+export default function Dashboard(): React.JSX.Element {
   return (
     <Layout title="Knowledge Base" description="Documentation for AJA Bridge Live & Comprimato Live Transcoder">
       <main className="dashboard">

@@ -9,7 +9,7 @@ const config: Config = {
   url: 'https://know.comprimato.com',
   baseUrl: '/',
   future: { v4: true },
-  onBrokenLinks: 'warn',
+  onBrokenLinks: 'throw',
   markdown: { hooks: { onBrokenMarkdownLinks: 'warn' } },
   i18n: { defaultLocale: 'en', locales: ['en'] },
 
@@ -191,7 +191,7 @@ const config: Config = {
 
     prism: {
       theme: prismThemes.github,
-      darkTheme: prismThemes.dracula,
+
       additionalLanguages: ['bash', 'yaml', 'docker', 'json'],
     },
   } satisfies Preset.ThemeConfig,

@@ -73,7 +73,7 @@ function ProductSwitcher({ activeId }: { activeId: 'live-transcoder' | 'twenty-o
 
 // ── Wrapper ───────────────────────────────────────────────────────────────────
 
-export default function DocSidebar(props: Props): JSX.Element {
+export default function DocSidebar(props: Props): React.JSX.Element {
   const windowSize = useWindowSize()
   const { pathname } = useLocation()
 

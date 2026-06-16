@@ -48,7 +48,7 @@ const PRODUCTS: Product[] = [
   },
 ]
 
-export default function ResourceGrid(): JSX.Element {
+export default function ResourceGrid(): React.JSX.Element {
   return (
     <div className="resource-grid">
       {PRODUCTS.map((product) => (
