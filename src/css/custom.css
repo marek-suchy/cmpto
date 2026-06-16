@@ -778,6 +778,13 @@ h1,
    Responsive — mobile
    ──────────────────────────────────────────────────────────────── */
 
+/* Feature detail pages + resource spec pages: keep TOC column in layout
+   (preserves same content width as /user-guides) but hide the TOC itself */
+.row:has(.feature-detail__header) .theme-doc-toc-desktop,
+.row:has(.resource-spec__meta) .theme-doc-toc-desktop {
+  visibility: hidden;
+}
+
 /* ────────────────────────────────────────────────────────────────
    Resources — grid & cards
    ──────────────────────────────────────────────────────────────── */
